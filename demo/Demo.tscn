@@ -98,4 +98,4 @@ visible = false
 terrain = NodePath("..")
 
 [node name="Rover" parent="." instance=ExtResource("9_egbwy")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31.5979, 1.05401, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 296.496, 122.81, 270.054)
