@@ -1,0 +1,113 @@
+[gd_scene load_steps=15 format=3 uid="uid://bihgqrot8tqf2"]
+
+[ext_resource type="Texture2D" uid="uid://c8vwnx65onnvv" path="res://addons/third-person-camera/TPC-demo/kenney_prototype_textures/green/texture_09.png" id="1_sctlm"]
+[ext_resource type="Script" uid="uid://bx3cswis3puvy" path="res://rover/rover.gd" id="1_txnhi"]
+[ext_resource type="Texture2D" uid="uid://b8dlw2gs1a6k" path="res://addons/third-person-camera/TPC-demo/kenney_prototype_textures/red/texture_13.png" id="2_txnhi"]
+[ext_resource type="Script" uid="uid://b8pb71l08utxm" path="res://rover/wheel.gd" id="4_rvw6p"]
+[ext_resource type="Script" uid="uid://cvyxaj4rpmp2j" path="res://rover/cam_spring_arm.gd" id="5_rvw6p"]
+[ext_resource type="Script" uid="uid://s3l5qdnrc0qa" path="res://rover/camera_follow.gd" id="6_hb2ta"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_s33a4"]
+albedo_texture = ExtResource("1_sctlm")
+
+[sub_resource type="BoxMesh" id="BoxMesh_rvw6p"]
+material = SubResource("StandardMaterial3D_s33a4")
+size = Vector3(1.2, 0.255, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hb2ta"]
+albedo_texture = ExtResource("2_txnhi")
+
+[sub_resource type="BoxMesh" id="BoxMesh_bv2uu"]
+material = SubResource("StandardMaterial3D_hb2ta")
+size = Vector3(0.6, 0.34, 0.545)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_f0a1j"]
+size = Vector3(1.2, 0.255, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rvw6p"]
+albedo_color = Color(0.20871, 0.20871, 0.20871, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_s33a4"]
+material = SubResource("StandardMaterial3D_rvw6p")
+top_radius = 0.2
+bottom_radius = 0.2
+height = 0.195
+radial_segments = 16
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_hb2ta"]
+
+[node name="Rover" type="RigidBody3D" node_paths=PackedStringArray("wheels")]
+collision_layer = 2
+mass = 40.0
+script = ExtResource("1_txnhi")
+wheels = [NodePath("WheelFL"), NodePath("WheelBL"), NodePath("WheelFR"), NodePath("WheelBR")]
+spring_strength = 4000.0
+spring_damping = 160.0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_rvw6p")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="MeshInstance3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.292578, 0.0273135, 0)
+mesh = SubResource("BoxMesh_bv2uu")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("BoxShape3D_f0a1j")
+
+[node name="WheelFL" type="RayCast3D" parent="." node_paths=PackedStringArray("rover", "wheel_mesh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.736708, 0, 0.530462)
+enabled = false
+script = ExtResource("4_rvw6p")
+rover = NodePath("..")
+wheel_mesh = NodePath("wheelMesh")
+
+[node name="wheelMesh" type="MeshInstance3D" parent="WheelFL"]
+transform = Transform3D(1.91069e-15, 4.37114e-08, 1, 1, -4.37114e-08, 0, 4.37114e-08, 1, -4.37114e-08, 0, -0.5, 0)
+mesh = SubResource("CylinderMesh_s33a4")
+
+[node name="WheelBL" type="RayCast3D" parent="." node_paths=PackedStringArray("wheel_mesh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.701513, 0, 0.530462)
+enabled = false
+script = ExtResource("4_rvw6p")
+wheel_mesh = NodePath("wheelMesh")
+
+[node name="wheelMesh" type="MeshInstance3D" parent="WheelBL"]
+transform = Transform3D(1.91069e-15, 4.37114e-08, 1, 1, -4.37114e-08, 0, 4.37114e-08, 1, -4.37114e-08, 0, -0.5, 0)
+mesh = SubResource("CylinderMesh_s33a4")
+
+[node name="WheelFR" type="RayCast3D" parent="." node_paths=PackedStringArray("wheel_mesh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.736708, 0, -0.53)
+enabled = false
+script = ExtResource("4_rvw6p")
+wheel_mesh = NodePath("wheelMesh")
+
+[node name="wheelMesh" type="MeshInstance3D" parent="WheelFR"]
+transform = Transform3D(1.91069e-15, 4.37114e-08, 1, 1, -4.37114e-08, 0, 4.37114e-08, 1, -4.37114e-08, 0, -0.5, 0)
+mesh = SubResource("CylinderMesh_s33a4")
+
+[node name="WheelBR" type="RayCast3D" parent="." node_paths=PackedStringArray("wheel_mesh")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.701513, 0, -0.53)
+enabled = false
+script = ExtResource("4_rvw6p")
+wheel_mesh = NodePath("wheelMesh")
+
+[node name="wheelMesh" type="MeshInstance3D" parent="WheelBR"]
+transform = Transform3D(1.91069e-15, 4.37114e-08, 1, 1, -4.37114e-08, 0, 4.37114e-08, 1, -4.37114e-08, 0, -0.5, 0)
+mesh = SubResource("CylinderMesh_s33a4")
+
+[node name="SpringArmPivot" type="Node3D" parent="." node_paths=PackedStringArray("spring_arm")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.118891, 0.601619, 0)
+script = ExtResource("5_rvw6p")
+spring_arm = NodePath("SpringArm3D")
+
+[node name="SpringArm3D" type="SpringArm3D" parent="SpringArmPivot"]
+collision_mask = 3
+shape = SubResource("SphereShape3D_hb2ta")
+spring_length = 6.0
+
+[node name="SpringPosition" type="Node3D" parent="SpringArmPivot/SpringArm3D"]
+
+[node name="Camera3D" type="Camera3D" parent="SpringArmPivot" node_paths=PackedStringArray("spring_target")]
+script = ExtResource("6_hb2ta")
+spring_target = NodePath("../SpringArm3D/SpringPosition")
+lerp_speed = 6.0
