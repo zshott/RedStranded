@@ -6,12 +6,17 @@ class_name Rover
 @export var decel : float = 33
 @export var max_speed : float = 20
 @export var accel_curve : Curve
+
+var grounded : bool 
 var motor_input : int = 0
 
 
 func _physics_process(delta: float) -> void:
+	grounded = false
 	for wheel in wheels:
 		wheel.force_raycast_update()
+		if wheel.is_colliding(): grounded = true
+		
 		_do_single_wheel_suspension(wheel)
 		_do_single_wheel_accel(wheel, delta)
 
@@ -32,22 +37,21 @@ func _do_single_wheel_accel(wheel : Wheel, delta :float)->void:
 	wheel.wheel_mesh.rotate_x(-vel * delta * 2 * PI * wheel.wheel_radius) # wheel surface area
 
 	if wheel.is_colliding() and wheel.is_motor:
-		var speed_ratio := vel / max_speed
-		var ac : float = accel_curve.sample_baked(speed_ratio)
 		var contact : Vector3 = wheel.global_position
-		var force_vec :Vector3 = forward_dir * accel * motor_input * ac
 		var force_pos_offset : Vector3 = contact - global_position
 
+		if wheel.is_motor and motor_input:
+			var speed_ratio := vel / max_speed
+			var ac : float = accel_curve.sample_baked(speed_ratio)
+			var force_vec :Vector3 = forward_dir * accel * motor_input * ac
 		# if abs(vel) > max_speed:
 		# 	force_vec = force_vec * 0.1
-
-		if motor_input:
 			apply_force(force_vec, force_pos_offset)
 			DebugDraw3D.draw_arrow(contact, contact + (force_vec / mass), Color.BLUE,.01)
-		elif abs(vel) > 0.15:
-			force_vec = global_basis.z * decel * signf(vel)
-			apply_force(force_vec, force_pos_offset)
-			DebugDraw3D.draw_arrow(contact, contact + (force_vec / mass), Color.AZURE,.01)
+		elif abs(vel) > 0.15 and not motor_input:
+			var drag_force_vec = global_basis.z * decel * signf(vel)
+			apply_force(drag_force_vec, force_pos_offset)
+			DebugDraw3D.draw_arrow(contact, contact + (drag_force_vec / mass), Color.AZURE,.01)
 
 func _do_single_wheel_suspension(wheel : Wheel)->void:
 	
@@ -68,7 +72,7 @@ func _do_single_wheel_suspension(wheel : Wheel)->void:
 		var spring_damp_force : float = wheel.spring_damping * relative_vel
 
 
-		var force_vec : Vector3 = (spring_force - spring_damp_force) * spring_up_dir
+		var force_vec : Vector3 = (spring_force - spring_damp_force) * wheel.get_collision_normal()
 
 		contact = wheel.wheel_mesh.global_position # makes car a bit more stable
 		var force_pos_offset : Vector3 = contact - self.global_position # apply_forces wants an offset and not a global pos

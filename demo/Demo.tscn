@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://chol2xlfbq7cu"]
+[gd_scene load_steps=15 format=3 uid="uid://chol2xlfbq7cu"]
 
 [ext_resource type="Script" uid="uid://chstoagn42gbr" path="res://demo/src/DemoScene.gd" id="1_k7qca"]
 [ext_resource type="PackedScene" uid="uid://d2jihfohphuue" path="res://demo/components/UI.tscn" id="2_nqak5"]
@@ -7,7 +7,9 @@
 [ext_resource type="PackedScene" uid="uid://bb2lp50sjndus" path="res://demo/components/Environment.tscn" id="3_yqldq"]
 [ext_resource type="PackedScene" uid="uid://d3sr0a7dxfkr8" path="res://addons/terrain_3d/extras/particle_example/Terrain3DParticles.tscn" id="8_fwrtk"]
 [ext_resource type="Terrain3DAssets" uid="uid://dal3jhw6241qg" path="res://demo/data/assets.tres" id="8_g2of2"]
-[ext_resource type="PackedScene" uid="uid://bihgqrot8tqf2" path="res://rover/rover.tscn" id="9_egbwy"]
+[ext_resource type="PackedScene" uid="uid://cgb6gqjj7k200" path="res://rover/test_suspension.tscn" id="9_fhs52"]
+[ext_resource type="PackedScene" uid="uid://domhm87hbhbg1" path="res://demo/components/Player.tscn" id="10_fhs52"]
+[ext_resource type="PackedScene" uid="uid://bihgqrot8tqf2" path="res://rover/rover.tscn" id="10_jkl3n"]
 
 [sub_resource type="Gradient" id="Gradient_vr1m7"]
 offsets = PackedFloat32Array(0.2, 1)
@@ -97,5 +99,15 @@ metadata/_edit_lock_ = true
 visible = false
 terrain = NodePath("..")
 
-[node name="Rover" parent="." instance=ExtResource("9_egbwy")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 296.496, 122.81, 270.054)
+[node name="test_suspension" parent="." instance=ExtResource("9_fhs52")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 311.683, 102.398, 261.694)
+
+[node name="Player" parent="." instance=ExtResource("10_fhs52")]
+transform = Transform3D(-0.357178, 0, 0.934036, 0, 1, 0, -0.934036, 0, -0.357178, 309.698, 99.1884, 267.889)
+MOVE_SPEED = 10.0
+first_person = true
+gravity_enabled = false
+collision_enabled = false
+
+[node name="Rover" parent="." instance=ExtResource("10_jkl3n")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 316.571, 102.243, 258.564)

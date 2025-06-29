@@ -1,0 +1,200 @@
+[gd_scene load_steps=8 format=3 uid="uid://cgb6gqjj7k200"]
+
+[ext_resource type="PackedScene" uid="uid://1j3lg7r60apb" path="res://rover/Car6.glb" id="1_x4twm"]
+[ext_resource type="PackedScene" uid="uid://bl77pqgagy1ph" path="res://rover/Car_wheel.glb" id="2_e6aj7"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_yol4y"]
+size = Vector3(2.336, 1, 6.16797)
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_jikk8"]
+height = 0.27
+radius = 0.45
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_x4twm"]
+albedo_color = Color(0.695503, 0.695503, 0.695503, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_e6aj7"]
+material = SubResource("StandardMaterial3D_x4twm")
+top_radius = 0.1
+bottom_radius = 0.1
+height = 2.2
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_yol4y"]
+height = 2.2
+radius = 0.1
+
+[node name="test_rover" type="Node3D"]
+
+[node name="Body" type="RigidBody3D" parent="."]
+mass = 60.0
+continuous_cd = true
+
+[node name="Car62" parent="Body" instance=ExtResource("1_x4twm")]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.01474, 1.12147, -0.0551758)
+shape = SubResource("BoxShape3D_yol4y")
+
+[node name="wheels" type="Node3D" parent="."]
+
+[node name="FR_Wheel" type="RigidBody3D" parent="wheels"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.18, -0.256364, 1.96954)
+mass = 5.0
+continuous_cd = true
+
+[node name="Car_wheel" parent="wheels/FR_Wheel" instance=ExtResource("2_e6aj7")]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="wheels/FR_Wheel"]
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
+shape = SubResource("CylinderShape3D_jikk8")
+
+[node name="FL_Wheel" type="RigidBody3D" parent="wheels"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.18, -0.256364, 1.97)
+mass = 5.0
+continuous_cd = true
+
+[node name="Car_wheel" parent="wheels/FL_Wheel" instance=ExtResource("2_e6aj7")]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="wheels/FL_Wheel"]
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
+shape = SubResource("CylinderShape3D_jikk8")
+
+[node name="RR_Wheel" type="RigidBody3D" parent="wheels"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.18, -0.256364, -1.78673)
+mass = 5.0
+continuous_cd = true
+
+[node name="Car_wheel" parent="wheels/RR_Wheel" instance=ExtResource("2_e6aj7")]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="wheels/RR_Wheel"]
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
+shape = SubResource("CylinderShape3D_jikk8")
+
+[node name="RL_Wheel" type="RigidBody3D" parent="wheels"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.18, -0.256364, -1.78627)
+mass = 5.0
+continuous_cd = true
+
+[node name="Car_wheel" parent="wheels/RL_Wheel" instance=ExtResource("2_e6aj7")]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="wheels/RL_Wheel"]
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
+shape = SubResource("CylinderShape3D_jikk8")
+
+[node name="F_Axle" type="RigidBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.243924, 1.98896)
+mass = 7.0
+continuous_cd = true
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="F_Axle"]
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
+mesh = SubResource("CylinderMesh_e6aj7")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="F_Axle"]
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
+shape = SubResource("CylinderShape3D_yol4y")
+
+[node name="R_Axle" type="RigidBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.243924, -1.76731)
+mass = 7.0
+continuous_cd = true
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="R_Axle"]
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
+mesh = SubResource("CylinderMesh_e6aj7")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="R_Axle"]
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
+shape = SubResource("CylinderShape3D_yol4y")
+
+[node name="FR_DOF" type="Generic6DOFJoint3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.00761, -0.26624, 1.98094)
+visible = false
+node_a = NodePath("../F_Axle")
+node_b = NodePath("../wheels/FR_Wheel")
+
+[node name="FL_DOF" type="Generic6DOFJoint3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.992387, -0.26624, 1.98094)
+visible = false
+node_a = NodePath("../F_Axle")
+node_b = NodePath("../wheels/FL_Wheel")
+
+[node name="RR_DOF" type="Generic6DOFJoint3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.00761, -0.26624, -1.77606)
+visible = false
+node_a = NodePath("../R_Axle")
+node_b = NodePath("../wheels/RR_Wheel")
+
+[node name="RL_DOF" type="Generic6DOFJoint3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.992387, -0.26624, -1.77606)
+visible = false
+node_a = NodePath("../R_Axle")
+node_b = NodePath("../wheels/RL_Wheel")
+
+[node name="FR_AxleDOF" type="Generic6DOFJoint3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.968642, 0.570723, 1.97647)
+node_a = NodePath("../Body")
+node_b = NodePath("../F_Axle")
+linear_limit_y/upper_distance = 0.425
+linear_limit_y/lower_distance = -0.48
+linear_limit_y/softness = 0.1
+linear_limit_y/restitution = 0.1
+linear_limit_y/damping = 0.1
+linear_spring_y/enabled = true
+linear_spring_y/stiffness = 1.0
+linear_spring_y/equilibrium_point = -0.845
+angular_limit_z/enabled = false
+angular_limit_z/upper_angle = -0.785398
+angular_limit_z/lower_angle = -0.785398
+angular_limit_z/softness = 0.01
+
+[node name="FL_AxleDOF" type="Generic6DOFJoint3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.95, 0.548452, 1.97)
+node_a = NodePath("../Body")
+node_b = NodePath("../F_Axle")
+linear_limit_y/upper_distance = 0.425
+linear_limit_y/lower_distance = -0.48
+linear_limit_y/softness = 0.1
+linear_limit_y/restitution = 0.1
+linear_limit_y/damping = 0.1
+linear_spring_y/enabled = true
+linear_spring_y/stiffness = 1.0
+linear_spring_y/equilibrium_point = -0.845
+angular_limit_z/enabled = false
+angular_limit_z/upper_angle = -0.785398
+angular_limit_z/lower_angle = -0.785398
+angular_limit_z/softness = 0.01
+
+[node name="RR_AxleDOF" type="Generic6DOFJoint3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.968642, 0.570723, -1.78053)
+node_a = NodePath("../Body")
+node_b = NodePath("../R_Axle")
+linear_limit_y/upper_distance = 0.425
+linear_limit_y/lower_distance = -0.48
+linear_limit_y/softness = 0.1
+linear_limit_y/restitution = 0.1
+linear_limit_y/damping = 0.1
+linear_spring_y/enabled = true
+linear_spring_y/stiffness = 1.0
+linear_spring_y/equilibrium_point = -0.845
+angular_limit_z/enabled = false
+angular_limit_z/upper_angle = -0.785398
+angular_limit_z/lower_angle = -0.785398
+angular_limit_z/softness = 0.01
+
+[node name="RL_AxleDOF" type="Generic6DOFJoint3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.95, 0.548725, -1.787)
+node_a = NodePath("../Body")
+node_b = NodePath("../R_Axle")
+linear_limit_y/upper_distance = 0.425
+linear_limit_y/lower_distance = -0.48
+linear_limit_y/softness = 0.1
+linear_limit_y/restitution = 0.1
+linear_limit_y/damping = 0.1
+linear_spring_y/enabled = true
+linear_spring_y/stiffness = 1.0
+linear_spring_y/equilibrium_point = -0.845
+angular_limit_z/enabled = false
+angular_limit_z/upper_angle = -0.785398
+angular_limit_z/lower_angle = -0.785398
+angular_limit_z/softness = 0.01

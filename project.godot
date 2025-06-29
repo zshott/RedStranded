@@ -23,6 +23,11 @@ gdscript/warnings/untyped_declaration=1
 
 settings/addon_root_folder="res://addons/debug_draw_3d"
 
+[display]
+
+window/size/viewport_width=1536
+window/size/viewport_height=864
+
 [input]
 
 left_click={
