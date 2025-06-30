@@ -16,7 +16,6 @@ func _physics_process(delta: float) -> void:
 	for wheel in wheels:
 		wheel.force_raycast_update()
 		if wheel.is_colliding(): grounded = true
-		
 		_do_single_wheel_suspension(wheel)
 		_do_single_wheel_accel(wheel, delta)
 
