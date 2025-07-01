@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3 uid="uid://chol2xlfbq7cu"]
+[gd_scene load_steps=13 format=3 uid="uid://chol2xlfbq7cu"]
 
 [ext_resource type="Script" uid="uid://chstoagn42gbr" path="res://demo/src/DemoScene.gd" id="1_k7qca"]
 [ext_resource type="PackedScene" uid="uid://d2jihfohphuue" path="res://demo/components/UI.tscn" id="2_nqak5"]
@@ -8,7 +8,6 @@
 [ext_resource type="PackedScene" uid="uid://d3sr0a7dxfkr8" path="res://addons/terrain_3d/extras/particle_example/Terrain3DParticles.tscn" id="8_fwrtk"]
 [ext_resource type="Terrain3DAssets" uid="uid://dal3jhw6241qg" path="res://demo/data/assets.tres" id="8_g2of2"]
 [ext_resource type="PackedScene" uid="uid://cgb6gqjj7k200" path="res://rover/test_suspension.tscn" id="9_fhs52"]
-[ext_resource type="PackedScene" uid="uid://domhm87hbhbg1" path="res://demo/components/Player.tscn" id="10_fhs52"]
 
 [sub_resource type="Gradient" id="Gradient_vr1m7"]
 offsets = PackedFloat32Array(0.2, 1)
@@ -72,16 +71,6 @@ world_background = 2
 auto_shader = true
 dual_scaling = true
 
-[sub_resource type="CylinderShape3D" id="CylinderShape3D_egbwy"]
-height = 0.2
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fhs52"]
-albedo_color = Color(0.310617, 0.310617, 0.310617, 1)
-
-[sub_resource type="CylinderMesh" id="CylinderMesh_jkl3n"]
-material = SubResource("StandardMaterial3D_fhs52")
-height = 0.2
-
 [node name="Demo" type="Node"]
 script = ExtResource("1_k7qca")
 
@@ -107,40 +96,6 @@ metadata/_edit_lock_ = true
 [node name="Terrain3DParticles" parent="Terrain3D" node_paths=PackedStringArray("terrain") instance=ExtResource("8_fwrtk")]
 visible = false
 terrain = NodePath("..")
-
-[node name="Player" parent="." instance=ExtResource("10_fhs52")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 304.753, 99.7264, 261.289)
-first_person = true
-
-[node name="Node3D" type="Node3D" parent="."]
-transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 305.633, 99.2109, 261.812)
-
-[node name="RigidBody3D" type="RigidBody3D" parent="Node3D"]
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Node3D/RigidBody3D"]
-shape = SubResource("CylinderShape3D_egbwy")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Node3D/RigidBody3D"]
-mesh = SubResource("CylinderMesh_jkl3n")
-
-[node name="RigidBody3D2" type="RigidBody3D" parent="Node3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0416031, -0.522461, 0)
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Node3D/RigidBody3D2"]
-shape = SubResource("CylinderShape3D_egbwy")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Node3D/RigidBody3D2"]
-mesh = SubResource("CylinderMesh_jkl3n")
-
-[node name="Generic6DOFJoint3D" type="Generic6DOFJoint3D" parent="Node3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.00831604, -0.263763, -0.0541077)
-node_a = NodePath("../RigidBody3D")
-node_b = NodePath("../RigidBody3D2")
-angular_limit_y/enabled = false
-angular_motor_x/enabled = true
-angular_motor_x/target_velocity = 5.23599
-angular_motor_x/force_limit = 6000.0
-angular_motor_z/target_velocity = 12.2173
 
 [node name="test_rover" parent="." instance=ExtResource("9_fhs52")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 304.259, 100.947, 266.935)
