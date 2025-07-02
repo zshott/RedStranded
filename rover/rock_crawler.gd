@@ -44,7 +44,7 @@ func _physics_process(delta: float) -> void:
 	motor_input = clampf(motor_input, -1.0, 1.0)
 	for w in wheels:
 		_do_wheel_accel(w, delta)
-	#(test.linear_velocity.length(), " | ", motor_input)#.dot(test.global_basis.z))
+	print(-test.angular_velocity.dot(test.global_basis.x))#.dot(test.global_basis.z))
 	#print(wheels[0].get_param_x(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_MOTOR_TARGET_VELOCITY))
 	#for w in wheel_body:
 	#	test_accel(w)

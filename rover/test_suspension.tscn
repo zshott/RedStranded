@@ -16,7 +16,7 @@ size = Vector3(2.336, 0.740173, 0.566772)
 size = Vector3(2.336, 1.00549, 0.719604)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_cttij"]
-size = Vector3(2.336, 1.46277, 2.50867)
+size = Vector3(2.336, 0.768, 2.509)
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_jikk8"]
 height = 0.27
@@ -68,7 +68,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.296994, 0)
 
 [node name="FR_Wheel" type="RigidBody3D" parent="wheels"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.18, -0.256364, 1.96954)
-mass = 5.0
+mass = 12.0
 continuous_cd = true
 
 [node name="Car_wheel" parent="wheels/FR_Wheel" instance=ExtResource("2_e6aj7")]
@@ -79,7 +79,7 @@ shape = SubResource("CylinderShape3D_jikk8")
 
 [node name="FL_Wheel" type="RigidBody3D" parent="wheels"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.18, -0.256, 1.97)
-mass = 5.0
+mass = 12.0
 continuous_cd = true
 
 [node name="Car_wheel" parent="wheels/FL_Wheel" instance=ExtResource("2_e6aj7")]
@@ -90,7 +90,7 @@ shape = SubResource("CylinderShape3D_jikk8")
 
 [node name="RR_Wheel" type="RigidBody3D" parent="wheels"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.18, -0.256364, -1.78673)
-mass = 5.0
+mass = 12.0
 continuous_cd = true
 
 [node name="Car_wheel" parent="wheels/RR_Wheel" instance=ExtResource("2_e6aj7")]
@@ -101,7 +101,7 @@ shape = SubResource("CylinderShape3D_jikk8")
 
 [node name="RL_Wheel" type="RigidBody3D" parent="wheels"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.18, -0.256364, -1.78627)
-mass = 5.0
+mass = 12.0
 continuous_cd = true
 
 [node name="Car_wheel" parent="wheels/RL_Wheel" instance=ExtResource("2_e6aj7")]
@@ -170,13 +170,13 @@ visible = false
 
 [node name="FR_AxleDOF" type="JoltGeneric6DOFJoint3D" parent="."]
 linear_limit_y/upper = 0.1
-linear_limit_y/lower = 0.025
-linear_limit_spring_y/frequency = 6.225
-linear_limit_spring_y/damping = 0.35
+linear_limit_y/lower = 0.3
 linear_spring_y/enabled = true
-linear_spring_y/damping = 135.0
-linear_spring_y/equilibrium_point = -0.3
-linear_spring_y/max_force = 10000.0
+linear_spring_y/frequency = 10.0
+linear_spring_y/damping = 0.5
+linear_spring_y/equilibrium_point = -0.2
+linear_spring_y/max_force = 1000.0
+angular_limit_z/enabled = false
 angular_limit_z/upper = 0.785398
 angular_limit_z/lower = -0.785398
 node_a = NodePath("..")
@@ -185,13 +185,13 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.968642, 0.339809, 1.97647)
 
 [node name="FL_AxleDOF" type="JoltGeneric6DOFJoint3D" parent="."]
 linear_limit_y/upper = 0.1
-linear_limit_y/lower = 0.025
-linear_limit_spring_y/frequency = 6.225
-linear_limit_spring_y/damping = 0.35
+linear_limit_y/lower = 0.3
 linear_spring_y/enabled = true
-linear_spring_y/damping = 135.0
-linear_spring_y/equilibrium_point = -0.3
-linear_spring_y/max_force = 10000.0
+linear_spring_y/frequency = 10.0
+linear_spring_y/damping = 0.5
+linear_spring_y/equilibrium_point = -0.2
+linear_spring_y/max_force = 1000.0
+angular_limit_z/enabled = false
 angular_limit_z/upper = 0.785398
 angular_limit_z/lower = -0.785398
 node_a = NodePath("..")
@@ -200,13 +200,13 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.95, 0.34, 1.97)
 
 [node name="RR_AxleDOF" type="JoltGeneric6DOFJoint3D" parent="."]
 linear_limit_y/upper = 0.1
-linear_limit_y/lower = 0.025
-linear_limit_spring_y/frequency = 6.225
-linear_limit_spring_y/damping = 0.35
+linear_limit_y/lower = 0.3
 linear_spring_y/enabled = true
-linear_spring_y/damping = 135.0
-linear_spring_y/equilibrium_point = -0.3
-linear_spring_y/max_force = 10000.0
+linear_spring_y/frequency = 10.0
+linear_spring_y/damping = 0.5
+linear_spring_y/equilibrium_point = -0.2
+linear_spring_y/max_force = 1000.0
+angular_limit_z/enabled = false
 angular_limit_z/upper = 0.785398
 angular_limit_z/lower = -0.785398
 node_a = NodePath("..")
@@ -215,13 +215,13 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.968642, 0.339809, -1.78053
 
 [node name="RL_AxleDOF" type="JoltGeneric6DOFJoint3D" parent="."]
 linear_limit_y/upper = 0.1
-linear_limit_y/lower = 0.025
-linear_limit_spring_y/frequency = 6.225
-linear_limit_spring_y/damping = 0.35
+linear_limit_y/lower = 0.3
 linear_spring_y/enabled = true
-linear_spring_y/damping = 135.0
-linear_spring_y/equilibrium_point = -0.3
-linear_spring_y/max_force = 10000.0
+linear_spring_y/frequency = 10.0
+linear_spring_y/damping = 0.5
+linear_spring_y/equilibrium_point = -0.2
+linear_spring_y/max_force = 1000.0
+angular_limit_z/enabled = false
 angular_limit_z/upper = 0.785398
 angular_limit_z/lower = -0.785398
 node_a = NodePath("..")
