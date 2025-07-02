@@ -1,9 +1,8 @@
-[gd_scene load_steps=10 format=3 uid="uid://dlb7n6y0yad2i"]
+[gd_scene load_steps=9 format=3 uid="uid://dlb7n6y0yad2i"]
 
 [ext_resource type="Texture2D" uid="uid://c48et1ytdunit" path="res://addons/kenney_prototype_textures/green/texture_02.png" id="1_x4mbn"]
 [ext_resource type="Texture2D" uid="uid://jaj3nhvopkoo" path="res://addons/kenney_prototype_textures/orange/texture_02.png" id="3_e6vom"]
-[ext_resource type="PackedScene" uid="uid://domhm87hbhbg1" path="res://demo/components/Player.tscn" id="3_x4mbn"]
-[ext_resource type="PackedScene" uid="uid://cgb6gqjj7k200" path="res://rover/test_suspension.tscn" id="4_hw6vf"]
+[ext_resource type="PackedScene" uid="uid://ioddjcf43fsl" path="res://rover/crawler.tscn" id="4_hw6vf"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_np6ep"]
 sky_horizon_color = Color(0.662243, 0.671743, 0.686743, 1)
@@ -45,12 +44,5 @@ use_collision = true
 size = Vector3(7.98523, 1, 4)
 material = SubResource("StandardMaterial3D_lktwm")
 
-[node name="Player" parent="." instance=ExtResource("3_x4mbn")]
-transform = Transform3D(-0.707107, 0, -0.707107, 0, 1, 0, 0.707107, 0, -0.707107, -5, 0, -10)
-MOVE_SPEED = 10.0
-first_person = true
-gravity_enabled = false
-collision_enabled = false
-
-[node name="test_rover" parent="." instance=ExtResource("4_hw6vf")]
-transform = Transform3D(0.121817, 0, -0.992553, 0, 1, 0, 0.992553, 0, 0.121817, -6.33495, 2, -1.15984)
+[node name="Rover" parent="." instance=ExtResource("4_hw6vf")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.3519, 0.709001, -4.36067)

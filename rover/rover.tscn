@@ -1,16 +1,11 @@
-[gd_scene load_steps=17 format=3 uid="uid://bihgqrot8tqf2"]
+[gd_scene load_steps=15 format=3 uid="uid://bihgqrot8tqf2"]
 
 [ext_resource type="Texture2D" uid="uid://c8vwnx65onnvv" path="res://addons/third-person-camera/TPC-demo/kenney_prototype_textures/green/texture_09.png" id="1_sctlm"]
 [ext_resource type="Script" uid="uid://bx3cswis3puvy" path="res://rover/rover.gd" id="1_txnhi"]
 [ext_resource type="Texture2D" uid="uid://b8dlw2gs1a6k" path="res://addons/third-person-camera/TPC-demo/kenney_prototype_textures/red/texture_13.png" id="2_txnhi"]
-[ext_resource type="Script" uid="uid://b8pb71l08utxm" path="res://rover/wheel.gd" id="4_rvw6p"]
 [ext_resource type="Texture2D" uid="uid://dsawc7s1kg73n" path="res://addons/kenney_prototype_textures/dark/texture_12.png" id="5_bv2uu"]
 [ext_resource type="Script" uid="uid://cvyxaj4rpmp2j" path="res://rover/cam_spring_arm.gd" id="5_rvw6p"]
 [ext_resource type="Script" uid="uid://s3l5qdnrc0qa" path="res://rover/camera_follow.gd" id="6_hb2ta"]
-
-[sub_resource type="Curve" id="Curve_hb2ta"]
-_data = [Vector2(0.0037831, 0.25), 0.0, 0.0, 0, 0, Vector2(0.295082, 0.89743), 0.0, 0.0, 0, 0, Vector2(0.696091, 0.830027), -0.0726234, -0.0726234, 0, 0, Vector2(1, 0.100316), 0.0, 0.0, 0, 0]
-point_count = 4
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_s33a4"]
 albedo_texture = ExtResource("1_sctlm")
@@ -48,9 +43,7 @@ mass = 40.0
 can_sleep = false
 continuous_cd = true
 script = ExtResource("1_txnhi")
-wheels = [NodePath("WheelFL"), NodePath("WheelBL"), NodePath("WheelFR"), NodePath("WheelBR")]
-decel = 125.0
-accel_curve = SubResource("Curve_hb2ta")
+wheels = [NodePath("WheelFL"), NodePath("WheelFR"), NodePath("WheelBL"), NodePath("WheelBR")]
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0.0067967, 0, 0.00706073)
@@ -64,55 +57,33 @@ mesh = SubResource("BoxMesh_bv2uu")
 transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0.0067967, 0, 0.00706073)
 shape = SubResource("BoxShape3D_f0a1j")
 
-[node name="WheelFL" type="RayCast3D" parent="." node_paths=PackedStringArray("rover", "wheel_mesh")]
+[node name="WheelFL" type="RayCast3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.537259, 0, 0.743769)
 enabled = false
-script = ExtResource("4_rvw6p")
-rover = NodePath("..")
-wheel_mesh = NodePath("wheelMesh")
-spring_strength = 300.0
-spring_damping = 80.0
 
 [node name="wheelMesh" type="MeshInstance3D" parent="WheelFL"]
 transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, -3.59989e-21, 3.59989e-21, -1.57356e-28, 1, 0, -0.5, 0)
 mesh = SubResource("CylinderMesh_s33a4")
 
-[node name="WheelFR" type="RayCast3D" parent="." node_paths=PackedStringArray("rover", "wheel_mesh")]
+[node name="WheelFR" type="RayCast3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.523203, 0, 0.743769)
 enabled = false
-script = ExtResource("4_rvw6p")
-rover = NodePath("..")
-wheel_mesh = NodePath("wheelMesh")
-spring_strength = 300.0
-spring_damping = 80.0
 
 [node name="wheelMesh" type="MeshInstance3D" parent="WheelFR"]
 transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, -3.59989e-21, 3.59989e-21, -1.57356e-28, 1, 0, -0.5, 0)
 mesh = SubResource("CylinderMesh_s33a4")
 
-[node name="WheelBL" type="RayCast3D" parent="." node_paths=PackedStringArray("rover", "wheel_mesh")]
+[node name="WheelBL" type="RayCast3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.537259, 0, -0.694452)
 enabled = false
-script = ExtResource("4_rvw6p")
-rover = NodePath("..")
-wheel_mesh = NodePath("wheelMesh")
-is_motor = false
-spring_strength = 300.0
-spring_damping = 80.0
 
 [node name="wheelMesh" type="MeshInstance3D" parent="WheelBL"]
 transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, -3.59989e-21, 3.59989e-21, -1.57356e-28, 1, 0, -0.5, 0)
 mesh = SubResource("CylinderMesh_s33a4")
 
-[node name="WheelBR" type="RayCast3D" parent="." node_paths=PackedStringArray("rover", "wheel_mesh")]
+[node name="WheelBR" type="RayCast3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.523203, 0, -0.694452)
 enabled = false
-script = ExtResource("4_rvw6p")
-rover = NodePath("..")
-wheel_mesh = NodePath("wheelMesh")
-is_motor = false
-spring_strength = 300.0
-spring_damping = 80.0
 
 [node name="wheelMesh" type="MeshInstance3D" parent="WheelBR"]
 transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, -3.59989e-21, 3.59989e-21, -1.57356e-28, 1, 0, -0.5, 0)

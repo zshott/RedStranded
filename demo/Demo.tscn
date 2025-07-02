@@ -5,9 +5,9 @@
 [ext_resource type="PackedScene" uid="uid://dwnhqfjq7v1pq" path="res://demo/components/Borders.tscn" id="3_cw38j"]
 [ext_resource type="PackedScene" uid="uid://djhl3foqkj4e2" path="res://demo/components/Tunnel.tscn" id="3_kdh0b"]
 [ext_resource type="PackedScene" uid="uid://bb2lp50sjndus" path="res://demo/components/Environment.tscn" id="3_yqldq"]
+[ext_resource type="PackedScene" uid="uid://ioddjcf43fsl" path="res://rover/crawler.tscn" id="8_egbwy"]
 [ext_resource type="PackedScene" uid="uid://d3sr0a7dxfkr8" path="res://addons/terrain_3d/extras/particle_example/Terrain3DParticles.tscn" id="8_fwrtk"]
 [ext_resource type="Terrain3DAssets" uid="uid://dal3jhw6241qg" path="res://demo/data/assets.tres" id="8_g2of2"]
-[ext_resource type="PackedScene" uid="uid://cgb6gqjj7k200" path="res://rover/test_suspension.tscn" id="9_fhs52"]
 
 [sub_resource type="Gradient" id="Gradient_vr1m7"]
 offsets = PackedFloat32Array(0.2, 1)
@@ -97,5 +97,5 @@ metadata/_edit_lock_ = true
 visible = false
 terrain = NodePath("..")
 
-[node name="test_rover" parent="." instance=ExtResource("9_fhs52")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 304.259, 100.947, 266.935)
+[node name="Rover" parent="." instance=ExtResource("8_egbwy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 307.04, 101.885, 270.395)

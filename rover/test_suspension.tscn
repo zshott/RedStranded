@@ -1,8 +1,9 @@
-[gd_scene load_steps=15 format=3 uid="uid://cgb6gqjj7k200"]
+[gd_scene load_steps=16 format=3 uid="uid://cgb6gqjj7k200"]
 
 [ext_resource type="Script" uid="uid://c1l10syewe5ww" path="res://rover/rock_crawler.gd" id="1_gyth0"]
 [ext_resource type="PackedScene" uid="uid://1j3lg7r60apb" path="res://rover/Car6.glb" id="1_x4twm"]
 [ext_resource type="PackedScene" uid="uid://bl77pqgagy1ph" path="res://rover/Car_wheel.glb" id="2_e6aj7"]
+[ext_resource type="Script" uid="uid://bymq2io82bv2x" path="res://rover/wheel.gd" id="3_4kymm"]
 [ext_resource type="Script" uid="uid://cvyxaj4rpmp2j" path="res://rover/cam_spring_arm.gd" id="4_j6q7d"]
 [ext_resource type="Script" uid="uid://s3l5qdnrc0qa" path="res://rover/camera_follow.gd" id="5_4kymm"]
 
@@ -37,15 +38,21 @@ radius = 0.1
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_cttij"]
 
-[node name="Body" type="RigidBody3D" node_paths=PackedStringArray("wheels", "wheel_body", "test")]
+[node name="Body" type="RigidBody3D" node_paths=PackedStringArray("wheels", "axles", "wheel_body", "test", "debug")]
+collision_layer = 2
 mass = 200.0
 continuous_cd = true
 script = ExtResource("1_gyth0")
 wheels = [NodePath("FR_DOF"), NodePath("FL_DOF"), NodePath("RR_DOF"), NodePath("RL_DOF")]
-wheel_body = [NodePath("wheels/FR_Wheel"), NodePath("wheels/FL_Wheel"), NodePath("wheels/RR_Wheel"), NodePath("wheels/RL_Wheel")]
+axles = [NodePath("FR_AxleDOF"), NodePath("FL_AxleDOF"), NodePath("RR_AxleDOF"), NodePath("RL_AxleDOF")]
+wheel_body = [NodePath("wheels/FR_Wheel"), NodePath("wheels/FL_Wheel")]
 test = NodePath("wheels/FR_Wheel")
+debug = NodePath("Label")
+ACCEL = 100.0
+MAX_STEER_ANGLE = 30.0
 
 [node name="Car62" parent="." instance=ExtResource("1_x4twm")]
+visible = false
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.01474, 0.867564, -0.0551758)
@@ -68,6 +75,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.296994, 0)
 
 [node name="FR_Wheel" type="RigidBody3D" parent="wheels"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.18, -0.256364, 1.96954)
+collision_layer = 4
 mass = 12.0
 continuous_cd = true
 
@@ -79,6 +87,7 @@ shape = SubResource("CylinderShape3D_jikk8")
 
 [node name="FL_Wheel" type="RigidBody3D" parent="wheels"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.18, -0.256, 1.97)
+collision_layer = 4
 mass = 12.0
 continuous_cd = true
 
@@ -90,6 +99,7 @@ shape = SubResource("CylinderShape3D_jikk8")
 
 [node name="RR_Wheel" type="RigidBody3D" parent="wheels"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.18, -0.256364, -1.78673)
+collision_layer = 4
 mass = 12.0
 continuous_cd = true
 
@@ -101,6 +111,7 @@ shape = SubResource("CylinderShape3D_jikk8")
 
 [node name="RL_Wheel" type="RigidBody3D" parent="wheels"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.18, -0.256364, -1.78627)
+collision_layer = 4
 mass = 12.0
 continuous_cd = true
 
@@ -111,7 +122,8 @@ transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 
 shape = SubResource("CylinderShape3D_jikk8")
 
 [node name="F_Axle" type="RigidBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0530697, 1.98896)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.033, 1.97)
+collision_layer = 4
 mass = 7.0
 continuous_cd = true
 
@@ -124,7 +136,8 @@ transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 
 shape = SubResource("CylinderShape3D_yol4y")
 
 [node name="R_Axle" type="RigidBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.0530697, -1.76731)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.033, -1.787)
+collision_layer = 4
 mass = 7.0
 continuous_cd = true
 
@@ -136,97 +149,119 @@ mesh = SubResource("CylinderMesh_e6aj7")
 transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
 shape = SubResource("CylinderShape3D_yol4y")
 
-[node name="FR_DOF" type="JoltGeneric6DOFJoint3D" parent="."]
+[node name="FR_DOF" type="JoltGeneric6DOFJoint3D" parent="." node_paths=PackedStringArray("rb")]
 angular_limit_x/enabled = false
-angular_motor_x/enabled = true
 node_a = NodePath("../F_Axle")
 node_b = NodePath("../wheels/FR_Wheel")
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.00761, 0.0307537, 1.98094)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.18, 0.031, 1.981)
 visible = false
+script = ExtResource("3_4kymm")
+rb = NodePath("../wheels/FR_Wheel")
+is_steer = true
 
-[node name="FL_DOF" type="JoltGeneric6DOFJoint3D" parent="."]
+[node name="FL_DOF" type="JoltGeneric6DOFJoint3D" parent="." node_paths=PackedStringArray("rb")]
 angular_limit_x/enabled = false
-angular_motor_x/enabled = true
 node_a = NodePath("../F_Axle")
 node_b = NodePath("../wheels/FL_Wheel")
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.992387, 0.0307537, 1.98094)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.18, 0.031, 1.981)
 visible = false
+script = ExtResource("3_4kymm")
+rb = NodePath("../wheels/FL_Wheel")
+is_steer = true
 
-[node name="RR_DOF" type="JoltGeneric6DOFJoint3D" parent="."]
+[node name="RR_DOF" type="JoltGeneric6DOFJoint3D" parent="." node_paths=PackedStringArray("rb")]
 angular_limit_x/enabled = false
-angular_motor_x/enabled = true
 node_a = NodePath("../R_Axle")
 node_b = NodePath("../wheels/RR_Wheel")
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.00761, 0.0307537, -1.77606)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.18, 0.031, -1.776)
 visible = false
+script = ExtResource("3_4kymm")
+rb = NodePath("../wheels/RR_Wheel")
 
-[node name="RL_DOF" type="JoltGeneric6DOFJoint3D" parent="."]
+[node name="RL_DOF" type="JoltGeneric6DOFJoint3D" parent="." node_paths=PackedStringArray("rb")]
 angular_limit_x/enabled = false
-angular_motor_x/enabled = true
 node_a = NodePath("../R_Axle")
 node_b = NodePath("../wheels/RL_Wheel")
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.992387, 0.0307537, -1.77606)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.18, 0.031, -1.776)
 visible = false
+script = ExtResource("3_4kymm")
+rb = NodePath("../wheels/RL_Wheel")
 
 [node name="FR_AxleDOF" type="JoltGeneric6DOFJoint3D" parent="."]
-linear_limit_y/upper = 0.1
-linear_limit_y/lower = 0.3
+linear_limit_y/upper = 0.285
+linear_limit_y/lower = -0.2
+linear_limit_spring_z/frequency = 20.0
+linear_limit_spring_z/damping = 1.0
 linear_spring_y/enabled = true
-linear_spring_y/frequency = 10.0
+linear_spring_y/frequency = 7.0
 linear_spring_y/damping = 0.5
 linear_spring_y/equilibrium_point = -0.2
-linear_spring_y/max_force = 1000.0
+linear_spring_y/max_force = 800.0
+angular_limit_x/enabled = false
 angular_limit_z/enabled = false
 angular_limit_z/upper = 0.785398
 angular_limit_z/lower = -0.785398
+angular_motor_x/enabled = true
 node_a = NodePath("..")
 node_b = NodePath("../F_Axle")
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.968642, 0.339809, 1.97647)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.008, 0.031, 1.97647)
 
 [node name="FL_AxleDOF" type="JoltGeneric6DOFJoint3D" parent="."]
-linear_limit_y/upper = 0.1
-linear_limit_y/lower = 0.3
+linear_limit_y/upper = 0.285
+linear_limit_y/lower = -0.2
+linear_limit_spring_z/frequency = 20.0
+linear_limit_spring_z/damping = 1.0
 linear_spring_y/enabled = true
-linear_spring_y/frequency = 10.0
+linear_spring_y/frequency = 7.0
 linear_spring_y/damping = 0.5
 linear_spring_y/equilibrium_point = -0.2
-linear_spring_y/max_force = 1000.0
+linear_spring_y/max_force = 800.0
+angular_limit_x/enabled = false
 angular_limit_z/enabled = false
 angular_limit_z/upper = 0.785398
 angular_limit_z/lower = -0.785398
+angular_motor_x/enabled = true
 node_a = NodePath("..")
 node_b = NodePath("../F_Axle")
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.95, 0.34, 1.97)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.008, 0.031, 1.976)
 
 [node name="RR_AxleDOF" type="JoltGeneric6DOFJoint3D" parent="."]
-linear_limit_y/upper = 0.1
-linear_limit_y/lower = 0.3
+linear_limit_y/upper = 0.285
+linear_limit_y/lower = -0.2
+linear_limit_spring_z/frequency = 20.0
+linear_limit_spring_z/damping = 1.0
 linear_spring_y/enabled = true
-linear_spring_y/frequency = 10.0
+linear_spring_y/frequency = 7.0
 linear_spring_y/damping = 0.5
 linear_spring_y/equilibrium_point = -0.2
-linear_spring_y/max_force = 1000.0
+linear_spring_y/max_force = 800.0
+angular_limit_x/enabled = false
 angular_limit_z/enabled = false
 angular_limit_z/upper = 0.785398
 angular_limit_z/lower = -0.785398
+angular_motor_x/enabled = true
 node_a = NodePath("..")
 node_b = NodePath("../R_Axle")
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.968642, 0.339809, -1.78053)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.008, 0.031, -1.781)
 
 [node name="RL_AxleDOF" type="JoltGeneric6DOFJoint3D" parent="."]
-linear_limit_y/upper = 0.1
-linear_limit_y/lower = 0.3
+linear_limit_y/upper = 0.285
+linear_limit_y/lower = -0.2
+linear_limit_spring_z/frequency = 20.0
+linear_limit_spring_z/damping = 1.0
 linear_spring_y/enabled = true
-linear_spring_y/frequency = 10.0
+linear_spring_y/frequency = 7.0
 linear_spring_y/damping = 0.5
 linear_spring_y/equilibrium_point = -0.2
-linear_spring_y/max_force = 1000.0
+linear_spring_y/max_force = 800.0
+angular_limit_x/enabled = false
 angular_limit_z/enabled = false
 angular_limit_z/upper = 0.785398
 angular_limit_z/lower = -0.785398
+angular_motor_x/enabled = true
 node_a = NodePath("..")
 node_b = NodePath("../R_Axle")
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.95, 0.34, -1.787)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.008, 0.031, -1.787)
 
 [node name="SpringArmPivot" type="Node3D" parent="." node_paths=PackedStringArray("spring_arm")]
 transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0.0067967, 1.60162, -0.11183)
@@ -244,3 +279,11 @@ spring_length = 6.0
 script = ExtResource("5_4kymm")
 spring_target = NodePath("../SpringArm3D/SpringPosition")
 lerp_speed = 6.0
+
+[node name="Label" type="Label" parent="."]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -304.0
+offset_bottom = 126.0
+grow_horizontal = 0
