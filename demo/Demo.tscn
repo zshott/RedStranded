@@ -1,11 +1,11 @@
-[gd_scene load_steps=13 format=3 uid="uid://chol2xlfbq7cu"]
+[gd_scene load_steps=14 format=3 uid="uid://chol2xlfbq7cu"]
 
 [ext_resource type="Script" uid="uid://chstoagn42gbr" path="res://demo/src/DemoScene.gd" id="1_k7qca"]
 [ext_resource type="PackedScene" uid="uid://d2jihfohphuue" path="res://demo/components/UI.tscn" id="2_nqak5"]
 [ext_resource type="PackedScene" uid="uid://dwnhqfjq7v1pq" path="res://demo/components/Borders.tscn" id="3_cw38j"]
 [ext_resource type="PackedScene" uid="uid://djhl3foqkj4e2" path="res://demo/components/Tunnel.tscn" id="3_kdh0b"]
 [ext_resource type="PackedScene" uid="uid://bb2lp50sjndus" path="res://demo/components/Environment.tscn" id="3_yqldq"]
-[ext_resource type="PackedScene" uid="uid://ioddjcf43fsl" path="res://rover/crawler.tscn" id="8_egbwy"]
+[ext_resource type="PackedScene" uid="uid://cgb6gqjj7k200" path="res://rover/test_suspension.tscn" id="8_egbwy"]
 [ext_resource type="PackedScene" uid="uid://d3sr0a7dxfkr8" path="res://addons/terrain_3d/extras/particle_example/Terrain3DParticles.tscn" id="8_fwrtk"]
 [ext_resource type="Terrain3DAssets" uid="uid://dal3jhw6241qg" path="res://demo/data/assets.tres" id="8_g2of2"]
 
@@ -71,6 +71,8 @@ world_background = 2
 auto_shader = true
 dual_scaling = true
 
+[sub_resource type="BoxMesh" id="BoxMesh_fwrtk"]
+
 [node name="Demo" type="Node"]
 script = ExtResource("1_k7qca")
 
@@ -97,5 +99,13 @@ metadata/_edit_lock_ = true
 visible = false
 terrain = NodePath("..")
 
-[node name="Rover" parent="." instance=ExtResource("8_egbwy")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 307.04, 101.885, 270.395)
+[node name="Body" parent="." instance=ExtResource("8_egbwy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 308.25, 103.32, 273.302)
+
+[node name="RigidBody3D" type="RigidBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 304.25, 111.32, 276.302)
+mass = 0.1
+gravity_scale = 0.0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="RigidBody3D"]
+mesh = SubResource("BoxMesh_fwrtk")

@@ -10,7 +10,7 @@ class_name Wheel
 @export var spring_strength : float = 100
 @export var spring_damping : float = 2
 @export var wheel_radius : float = .2
-@onready var rest_length : float = .5
+@onready var rest_length : float = .3
 @export var over_extend : float = 0.0 # pulls the car to the floor
 
 func _ready() -> void:

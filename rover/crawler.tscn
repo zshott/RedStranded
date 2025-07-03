@@ -1,7 +1,7 @@
 [gd_scene load_steps=18 format=3 uid="uid://ioddjcf43fsl"]
 
 [ext_resource type="Script" uid="uid://b3htes01ovluq" path="res://rover/crawler.gd" id="1_2vkci"]
-[ext_resource type="Texture2D" uid="uid://c8vwnx65onnvv" path="res://addons/third-person-camera/TPC-demo/kenney_prototype_textures/green/texture_09.png" id="2_6u8jw"]
+[ext_resource type="Texture2D" uid="uid://dmc3jod7kbtrk" path="res://addons/kenney_prototype_textures/orange/texture_01.png" id="2_2vkci"]
 [ext_resource type="Texture2D" uid="uid://b8dlw2gs1a6k" path="res://addons/third-person-camera/TPC-demo/kenney_prototype_textures/red/texture_13.png" id="3_80l3l"]
 [ext_resource type="Script" uid="uid://b8pb71l08utxm" path="res://rover/wheel_old.gd" id="4_6c06o"]
 [ext_resource type="Texture2D" uid="uid://dsawc7s1kg73n" path="res://addons/kenney_prototype_textures/dark/texture_12.png" id="5_0f05d"]
@@ -13,11 +13,11 @@ _data = [Vector2(0, 0.181102), 0.0, 0.0, 0, 0, Vector2(0.257143, 0.868391), 0.0,
 point_count = 4
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_s33a4"]
-albedo_texture = ExtResource("2_6u8jw")
+albedo_texture = ExtResource("2_2vkci")
 
 [sub_resource type="BoxMesh" id="BoxMesh_rvw6p"]
 material = SubResource("StandardMaterial3D_s33a4")
-size = Vector3(1.2, 0.255, 1)
+size = Vector3(2.93403, 0.501523, 1.50879)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hb2ta"]
 albedo_texture = ExtResource("3_80l3l")
@@ -27,7 +27,7 @@ material = SubResource("StandardMaterial3D_hb2ta")
 size = Vector3(0.6, 0.34, 0.545)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_f0a1j"]
-size = Vector3(1.2, 0.255, 1)
+size = Vector3(2.93403, 0.501523, 1.50879)
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_2vkci"]
 height = 0.2
@@ -48,7 +48,7 @@ radial_segments = 16
 
 [node name="Rover" type="RigidBody3D" node_paths=PackedStringArray("wheels")]
 collision_layer = 2
-mass = 40.0
+mass = 50.0
 can_sleep = false
 continuous_cd = true
 script = ExtResource("1_2vkci")
@@ -59,32 +59,32 @@ max_speed = 30.0
 accel_curve = SubResource("Curve_2vkci")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0.0067967, 0, 0.00706073)
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0.0067967, 0.290781, 0.00706073)
 mesh = SubResource("BoxMesh_rvw6p")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="MeshInstance3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.292578, 0.0273135, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.921966, 0.282417, 0)
 mesh = SubResource("BoxMesh_bv2uu")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0.0067967, 0, 0.00706073)
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0.0067967, 0.414043, -0.0493114)
 shape = SubResource("BoxShape3D_f0a1j")
 
 [node name="Node3D" type="Node3D" parent="."]
 
 [node name="FL" type="Node3D" parent="Node3D" node_paths=PackedStringArray("sc", "wheel_mesh")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7, -0.004, 0.744)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7, -0.004, 1.06988)
 script = ExtResource("4_6c06o")
 sc = NodePath("WheelFL")
 wheel_mesh = NodePath("wheelMesh")
-spring_strength = 300.0
-spring_damping = 80.0
+spring_strength = 4000.0
+spring_damping = 100.0
 
 [node name="WheelFL" type="ShapeCast3D" parent="Node3D/FL"]
 transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
 enabled = false
 shape = SubResource("CylinderShape3D_2vkci")
-target_position = Vector3(-0.8, 0, 0)
+target_position = Vector3(-0.5, 0, 0)
 max_results = 1
 
 [node name="wheelMesh" type="MeshInstance3D" parent="Node3D/FL"]
@@ -93,18 +93,18 @@ mesh = SubResource("CylinderMesh_s33a4")
 skeleton = NodePath("../WheelFL")
 
 [node name="FR" type="Node3D" parent="Node3D" node_paths=PackedStringArray("sc", "wheel_mesh")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.7, -0.004, 0.744)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.7, -0.004, 1.06988)
 script = ExtResource("4_6c06o")
 sc = NodePath("WheelFR")
 wheel_mesh = NodePath("wheelMesh")
-spring_strength = 300.0
-spring_damping = 80.0
+spring_strength = 4000.0
+spring_damping = 100.0
 
 [node name="WheelFR" type="ShapeCast3D" parent="Node3D/FR"]
 transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
 enabled = false
 shape = SubResource("CylinderShape3D_2vkci")
-target_position = Vector3(-0.8, 0, 0)
+target_position = Vector3(-0.5, 0, 0)
 max_results = 1
 
 [node name="wheelMesh" type="MeshInstance3D" parent="Node3D/FR"]
@@ -113,18 +113,19 @@ mesh = SubResource("CylinderMesh_s33a4")
 skeleton = NodePath("../WheelFR")
 
 [node name="RL" type="Node3D" parent="Node3D" node_paths=PackedStringArray("sc", "wheel_mesh")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7, -0.004, -0.694)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7, -0.004, -1.11301)
 script = ExtResource("4_6c06o")
 sc = NodePath("WheelRL")
 wheel_mesh = NodePath("wheelMesh")
-spring_strength = 300.0
-spring_damping = 80.0
+is_motor = false
+spring_strength = 4000.0
+spring_damping = 100.0
 
 [node name="WheelRL" type="ShapeCast3D" parent="Node3D/RL"]
 transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
 enabled = false
 shape = SubResource("CylinderShape3D_2vkci")
-target_position = Vector3(-0.8, 0, 0)
+target_position = Vector3(-0.5, 0, 0)
 max_results = 1
 
 [node name="wheelMesh" type="MeshInstance3D" parent="Node3D/RL"]
@@ -133,18 +134,19 @@ mesh = SubResource("CylinderMesh_s33a4")
 skeleton = NodePath("../WheelRL")
 
 [node name="RR" type="Node3D" parent="Node3D" node_paths=PackedStringArray("sc", "wheel_mesh")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.7, -0.004, -0.694)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.7, -0.004, -1.11301)
 script = ExtResource("4_6c06o")
 sc = NodePath("WheelRR")
 wheel_mesh = NodePath("wheelMesh")
-spring_strength = 300.0
-spring_damping = 80.0
+is_motor = false
+spring_strength = 4000.0
+spring_damping = 100.0
 
 [node name="WheelRR" type="ShapeCast3D" parent="Node3D/RR"]
 transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
 enabled = false
 shape = SubResource("CylinderShape3D_2vkci")
-target_position = Vector3(-0.8, 0, 0)
+target_position = Vector3(-0.5, 0, 0)
 max_results = 1
 
 [node name="wheelMesh" type="MeshInstance3D" parent="Node3D/RR"]

@@ -2,7 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://c48et1ytdunit" path="res://addons/kenney_prototype_textures/green/texture_02.png" id="1_x4mbn"]
 [ext_resource type="Texture2D" uid="uid://jaj3nhvopkoo" path="res://addons/kenney_prototype_textures/orange/texture_02.png" id="3_e6vom"]
-[ext_resource type="PackedScene" uid="uid://ioddjcf43fsl" path="res://rover/crawler.tscn" id="4_hw6vf"]
+[ext_resource type="PackedScene" uid="uid://cgb6gqjj7k200" path="res://rover/test_suspension.tscn" id="3_x4mbn"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_np6ep"]
 sky_horizon_color = Color(0.662243, 0.671743, 0.686743, 1)
@@ -44,5 +44,5 @@ use_collision = true
 size = Vector3(7.98523, 1, 4)
 material = SubResource("StandardMaterial3D_lktwm")
 
-[node name="Rover" parent="." instance=ExtResource("4_hw6vf")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.3519, 0.709001, -4.36067)
+[node name="Body" parent="." instance=ExtResource("3_x4mbn")]
+transform = Transform3D(0.230712, 0, -0.973022, 0, 1, 0, 0.973022, 0, 0.230712, -6.67656, 2.19512, -1.5281)
