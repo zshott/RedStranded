@@ -1,0 +1,32 @@
+[gd_scene load_steps=5 format=3 uid="uid://cgn23djr4chcj"]
+
+[ext_resource type="PackedScene" uid="uid://cgb6gqjj7k200" path="res://rover/test_suspension.tscn" id="1_teypx"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_uryu6"]
+sky_horizon_color = Color(0.662243, 0.671743, 0.686743, 1)
+ground_horizon_color = Color(0.662243, 0.671743, 0.686743, 1)
+
+[sub_resource type="Sky" id="Sky_tjx7v"]
+sky_material = SubResource("ProceduralSkyMaterial_uryu6")
+
+[sub_resource type="Environment" id="Environment_7a07h"]
+background_mode = 2
+sky = SubResource("Sky_tjx7v")
+tonemap_mode = 2
+glow_enabled = true
+
+[node name="Node3D" type="Node3D"]
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.866023, -0.433016, 0.250001, 0, 0.499998, 0.866027, -0.500003, 0.749999, -0.43301, 0, 0, 0)
+shadow_enabled = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_7a07h")
+
+[node name="CSGBox3D" type="CSGBox3D" parent="."]
+use_collision = true
+size = Vector3(11.4729, 1, 11.2522)
+
+[node name="Body" parent="." instance=ExtResource("1_teypx")]
+transform = Transform3D(-1, 8.74228e-08, 0, -8.74228e-08, -1, 0, 0, 0, 1, 0.335758, 3.58826, 0.387042)

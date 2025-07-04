@@ -9,7 +9,7 @@ class_name RockCrawler
 
 @export var ACCEL : float = 30
 @export var MAX_SPEED : float = 40
-@export_range(0.0, 90.0, 0.1) var MAX_STEER_ANGLE : float = 40.0
+@export_range(0.0, 90.0, 0.1) var MAX_STEER_ANGLE : float = 180
 @export var WHEEL_FORCE_LIMIT : float = 5000
 
 var motor_input : int = 0
@@ -18,15 +18,13 @@ var last_rotation : float = 0
 
 func _ready() -> void:
 	for w in wheels:
-		w.set_param_x(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_MOTOR_MAX_TORQUE, WHEEL_FORCE_LIMIT)
+		
 		if w.is_steer:
-				w.set_param_y(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_LIMIT_LOWER, deg_to_rad(-MAX_STEER_ANGLE))
 				w.set_param_y(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_LIMIT_UPPER, deg_to_rad(MAX_STEER_ANGLE))
-				w.set_param_y(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_MOTOR_MAX_TORQUE, 300)
-	# for w in wheels:
-	# 	if w.is_steer:
-	# 		w.set_param_z(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_LIMIT_UPPER, MAX_STEER_ANGLE)
-	# 		w.set_param_z(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_LIMIT_LOWER, -MAX_STEER_ANGLE)
+				w.set_param_y(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_LIMIT_LOWER, deg_to_rad(-MAX_STEER_ANGLE))
+				w.set_param_y(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_MOTOR_MAX_TORQUE, 3000)
+	for w in wheels:
+		w.set_param_x(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_MOTOR_MAX_TORQUE, WHEEL_FORCE_LIMIT)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("accelerate"):
@@ -62,23 +60,27 @@ func _physics_process(delta: float) -> void:
 	
 					
 
-	
-	
-	print(steer_input)
 	# if steer_input:
 	for w in wheels:
-		if w.is_steer and steer_input:
-			w.set_param_y(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_LIMIT_LOWER, deg_to_rad(-MAX_STEER_ANGLE))
-			w.set_param_y(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_LIMIT_UPPER, deg_to_rad(MAX_STEER_ANGLE))
+		if w.is_steer:
+			#w.set_param_y(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_LIMIT_UPPER, deg_to_rad(w.last_rot_y))
+			#w.set_param_y(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_LIMIT_LOWER, deg_to_rad(w.last_rot_y))
+			if steer_input:
+				w.set_param_y(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_LIMIT_LOWER, deg_to_rad(-MAX_STEER_ANGLE))
+				w.set_param_y(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_LIMIT_UPPER, deg_to_rad(MAX_STEER_ANGLE))
 			#w.rb.apply_torque(Vector3.UP * steer_input * 20) 
 			#w.rb.apply_torque(Vector3.UP.cross(w.rb.basis.y) * 5)
 			#.set_flag_y(JoltGeneric6DOFJoint3D.FLAG_ENABLE_ANGULAR_MOTOR, true)
 			#w.set_param_y(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_MOTOR_MAX_TORQUE, 10)
-			w.set_param_y(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_MOTOR_TARGET_VELOCITY, steer_input * 10)
+			w.set_param_y(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_MOTOR_TARGET_VELOCITY, deg_to_rad(steer_input * 50))
 		# elif w.is_steer:
-		w.last_rot_y = w.rb.rotation_degrees.y
-		# 	w.set_param_y(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_LIMIT_UPPER, deg_to_rad(w.last_rot_y))
-		# 	w.set_param_y(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_LIMIT_LOWER, deg_to_rad(w.last_rot_y))
+			w.last_rot_y = w.rb.rotation_degrees.y
+
+			# if w.last_rot_y < 2 and w.last_rot_y > -178:
+			# 	w.last_rot_y = 0
+				
+
+			w.set_param_y(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_SPRING_EQUILIBRIUM_POINT, deg_to_rad(w.last_rot_y))
 		# 	w.set_param_y(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_MOTOR_TARGET_VELOCITY, 0)
 
 	for w in wheels:
@@ -105,8 +107,8 @@ func _physics_process(delta: float) -> void:
 
 func _do_wheel_accel(w: JoltGeneric6DOFJoint3D, delta: float):
 	w.set_param_x(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_MOTOR_TARGET_VELOCITY, motor_input * ACCEL)
-	#w.rb.apply_torque((w.rb.basis.x) * motor_input * ACCEL)
-	DebugDraw3D.draw_arrow(w.rb.global_position, w.rb.global_position + (w.rb.global_transform.basis.orthonormalized() * Vector3.FORWARD) * motor_input *ACCEL, Color.BLUE, .01)
+	#w.rb.apply_torque(Vector3.LEFT.cross(w.rb.global_basis.x) * motor_input * ACCEL * 5)
+	DebugDraw3D.draw_arrow(w.rb.global_position, w.rb.global_position + (w.rb.global_basis) * Vector3.LEFT * motor_input * ACCEL, Color.BLUE, .01)
 	#DebugDraw3D.draw_arrow(w.rb.global_position, w.rb.global_position + (-Vector3.UP.cross(w.rb.global_basis.y)) * motor_input *ACCEL/ 4, Color.RED, .01)
 
 	
