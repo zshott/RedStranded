@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://chol2xlfbq7cu"]
+[gd_scene load_steps=13 format=3 uid="uid://chol2xlfbq7cu"]
 
 [ext_resource type="Script" uid="uid://chstoagn42gbr" path="res://demo/src/DemoScene.gd" id="1_k7qca"]
 [ext_resource type="PackedScene" uid="uid://d2jihfohphuue" path="res://demo/components/UI.tscn" id="2_nqak5"]
@@ -71,12 +71,11 @@ world_background = 2
 auto_shader = true
 dual_scaling = true
 
-[sub_resource type="BoxMesh" id="BoxMesh_fwrtk"]
-
 [node name="Demo" type="Node"]
 script = ExtResource("1_k7qca")
 
 [node name="UI" parent="." instance=ExtResource("2_nqak5")]
+visible = false
 mouse_filter = 2
 
 [node name="Environment" parent="." instance=ExtResource("3_yqldq")]
@@ -101,11 +100,3 @@ terrain = NodePath("..")
 
 [node name="Body" parent="." instance=ExtResource("8_egbwy")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 308.25, 103.32, 273.302)
-
-[node name="RigidBody3D" type="RigidBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 304.25, 111.32, 276.302)
-mass = 0.1
-gravity_scale = 0.0
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="RigidBody3D"]
-mesh = SubResource("BoxMesh_fwrtk")

@@ -2,6 +2,7 @@ extends RigidBody3D
 class_name RockCrawler
 
 @export var wheels: Array[JoltGeneric6DOFJoint3D]
+@export var steer_wheels: Array[JoltGeneric6DOFJoint3D]
 @export var axles: Array[JoltGeneric6DOFJoint3D]
 @export var wheel_body : Array[RigidBody3D]
 @export var test : RigidBody3D
@@ -15,6 +16,9 @@ class_name RockCrawler
 var motor_input : int = 0
 var steer_input : float = 0
 var last_rotation : float = 0
+
+enum INPUT_SCEMES {KBM, GAMEPAD}
+static var INPUT_SCHEME := INPUT_SCEMES.KBM
 
 func _ready() -> void:
 	for w in wheels:
@@ -55,21 +59,21 @@ func _physics_process(delta: float) -> void:
 	
 	# motor_input = clampf(motor_input, -1.0, 1.0)
 
-	steer_input = Input.get_axis("steer_right", "steer_left")
+	steer_input = Input.get_axis("steer_left", "steer_right")
+	print(steer_input)
 	var inner_wheel_steering_angle_factor : float = 1.33
 
 	var base_steer_angle : float = deg_to_rad(steer_input * MAX_STEER_ANGLE)
-	for i in range(wheels.size()):
-		var w : JoltGeneric6DOFJoint3D = wheels[i]
-		if w.is_steer:
-			var this_factor : float = 1.0
-			if i == 0 and base_steer_angle < 0.0:
-				this_factor = inner_wheel_steering_angle_factor
-			elif i == 1 and base_steer_angle > 0.0:
-				this_factor = inner_wheel_steering_angle_factor
+	for i in range(steer_wheels.size()):
+		var w : JoltGeneric6DOFJoint3D = steer_wheels[i]
+		var this_factor : float = 1.0
+		if i == 0 and base_steer_angle < 0.0:
+			this_factor = inner_wheel_steering_angle_factor
+		elif i == 1 and base_steer_angle > 0.0:
+			this_factor = inner_wheel_steering_angle_factor
 
-			w.set_param_y(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_LIMIT_LOWER, base_steer_angle * this_factor)
-			w.set_param_y(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_LIMIT_UPPER, base_steer_angle * this_factor)
+		w.set_param_y(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_LIMIT_LOWER, base_steer_angle * this_factor)
+		w.set_param_y(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_LIMIT_UPPER, base_steer_angle * this_factor)
 					
 
 	# if steer_input:
@@ -117,12 +121,10 @@ func _physics_process(delta: float) -> void:
 	#	test_accel(w)
 
 
-func _do_wheel_accel(w: JoltGeneric6DOFJoint3D, delta: float):
-	w.set_param_x(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_MOTOR_TARGET_VELOCITY, motor_input * ACCEL)
+func _do_wheel_accel(w: JoltGeneric6DOFJoint3D, delta: float)->void:
+	w.set_param_x(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_MOTOR_TARGET_VELOCITY, -motor_input * ACCEL)
 	#w.rb.apply_torque(Vector3.LEFT.cross(w.rb.global_basis.x) * motor_input * ACCEL * 5)
-	DebugDraw3D.draw_arrow(w.rb.global_position, w.rb.global_position + (w.rb.global_basis) * Vector3.LEFT * motor_input * ACCEL, Color.BLUE, .01)
+	#DebugDraw3D.draw_arrow(w.rb.global_position, w.rb.global_position + (w.rb.global_basis) * Vector3.LEFT * motor_input * ACCEL, Color.BLUE, .01)
 	#DebugDraw3D.draw_arrow(w.rb.global_position, w.rb.global_position + (-Vector3.UP.cross(w.rb.global_basis.y)) * motor_input *ACCEL/ 4, Color.RED, .01)
 
 	
-func test_accel(w: RigidBody3D):
-	w.apply_force(-w.global_basis.z * ACCEL * motor_input, w.position)

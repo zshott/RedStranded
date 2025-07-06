@@ -9,7 +9,7 @@ func _init() -> void:
 	RenderingServer.set_debug_generate_wireframes(true)
 
 
-func _process(p_delta) -> void:
+func _process(p_delta:float) -> void:
 	$Label.text = "FPS: %d\n" % Engine.get_frames_per_second()
 	if(visible_mode == 1):
 		$Label.text += "Move Speed: %.1f\n" % player.MOVE_SPEED if player else ""
@@ -41,7 +41,7 @@ func _unhandled_key_input(p_event: InputEvent) -> void:
 				$Label/Panel.visible = (visible_mode == 1)
 				visible = visible_mode > 0
 			KEY_F10:
-				var vp = get_viewport()
+				var vp := get_viewport()
 				vp.debug_draw = (vp.debug_draw + 1 ) % 6
 				get_viewport().set_input_as_handled()
 			KEY_F11:
