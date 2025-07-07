@@ -47,10 +47,10 @@ func _do_single_wheel_accel(wheel : Wheel, delta :float)->void:
 		# 	force_vec = force_vec * 0.1
 			apply_force(force_vec, force_pos_offset)
 			DebugDraw3D.draw_arrow(contact, contact + (force_vec / mass), Color.BLUE,.01)
-		# elif abs(vel) > 0.15 and not motor_input:
-		# 	var drag_force_vec = global_basis.z * decel * signf(vel)
-		# 	apply_force(drag_force_vec, force_pos_offset)
-		# 	DebugDraw3D.draw_arrow(contact, contact + (drag_force_vec / mass), Color.AZURE,.01)
+		elif abs(vel) > 0.15 and not motor_input:
+			var drag_force_vec = global_basis.z * decel * signf(vel)
+			apply_force(drag_force_vec, force_pos_offset)
+			DebugDraw3D.draw_arrow(contact, contact + (drag_force_vec / mass), Color.AZURE,.01)
 
 func _do_single_wheel_suspension(wheel : Wheel)->void:
 	if wheel.sc.get_collision_count() > 0:

@@ -8,59 +8,69 @@ class_name RockCrawler
 @export var test : RigidBody3D
 @export var debug : Label
 
-@export var ACCEL : float = 30
+## Engine RPM to torque
+@export var TORQUE_CURVE : Curve
+## Max Engine RPM
+@export var MAX_RPM : float = 6800
+## Engine RPM at idle
+@export var IDLE_RPM : float = 1000
+## Max torque in newton-meters
+@export var MAX_TORQUE : float = 300
+## Torque applied by the brakes, it is a contstant torque
+@export var BRAKE_TORQUE : float = 30
+## Gear ratios, from Reverse->First->Second, etc.
+@export var GEAR_RATIOS : Array[float] = [2.0, 2.66, 2.1]
+## Differential ratio
+@export var DIFF_RATIO : float = 3.4 
+## Transmission efficiency, must be between 0.0 and 1.0
+@export var TRANS_EFF : float = 0.7
+## Radius of wheel
+@export var WHEEL_RADIUS : float = .45
+## Mass of wheel
+@export var WHEEL_MASS : float = 12
+
 @export var MAX_SPEED : float = 40
 @export_range(0.0, 90.0, 0.1) var MAX_STEER_ANGLE : float = 180
 @export var WHEEL_FORCE_LIMIT : float = 5000
 
-var motor_input : int = 0
+@export var ACCEL_CURVE : Curve 
+
+## player throttle input
+var throttle : float = 0
+var brake : float = 0
 var steer_input : float = 0
+var _rpm : float = 0.0
 var last_rotation : float = 0
+var _wish_wheel_torque : float
+var _wheel_angular_vel : float
+
+## Gears
+enum GEARS {REVERSE, FIRST, SECOND}
+var cur_gear : int = GEARS.FIRST
 
 enum INPUT_SCEMES {KBM, GAMEPAD}
 static var INPUT_SCHEME := INPUT_SCEMES.KBM
 
-func _ready() -> void:
-	for w in wheels:
-		
-		if w.is_steer:
-				w.set_param_y(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_LIMIT_UPPER, deg_to_rad(MAX_STEER_ANGLE))
-				w.set_param_y(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_LIMIT_LOWER, deg_to_rad(-MAX_STEER_ANGLE))
-				#w.set_param_y(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_MOTOR_MAX_TORQUE, 3000)
-	for w in wheels:
-		w.set_param_x(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_MOTOR_MAX_TORQUE, WHEEL_FORCE_LIMIT)
+#func _ready() -> void:
 
-func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("accelerate"):
-		motor_input = 1
-		print("blah")
-	if event.is_action_released("accelerate"):
-		motor_input = 0
+# func _unhandled_input(event: InputEvent) -> void:
+# 	if event.is_action_pressed("accelerate"):
+# 		throttle = 1
+# 		print("blah")
+# 	elif event.is_action_released("accelerate"):
+# 		throttle = 0
 
-	elif event.is_action_pressed("brake"):
-		motor_input = -1
-	if event.is_action_released("brake"):
-		motor_input = 0
-	# else:
-	# 	var s := signf(motor_input)
-	# 	motor_input += -s * 0.01
+# 	if event.is_action_pressed("brake"):
+# 		throttle = -1
+# 	elif event.is_action_released("brake"):
+# 		throttle = 0
 
 func _physics_process(delta: float) -> void:
-	# if Input.is_action_pressed("accelerate"):
-	# 	motor_input = 1
-
-	# elif Input.is_action_pressed("brake"):
-	# 	motor_input = -1
-	# if event.is_action_released("brake"):
-	# 	motor_input = 0
-	# else:
-	# 	var s := signf(motor_input)
-	# 	motor_input += -s * 0.01
-	
-	# motor_input = clampf(motor_input, -1.0, 1.0)
+	throttle = Input.get_action_strength("accelerate")
+	brake = Input.get_action_strength("brake")
 
 	steer_input = Input.get_axis("steer_left", "steer_right")
-	print(steer_input)
+	
 	var inner_wheel_steering_angle_factor : float = 1.33
 
 	var base_steer_angle : float = deg_to_rad(steer_input * MAX_STEER_ANGLE)
@@ -74,57 +84,53 @@ func _physics_process(delta: float) -> void:
 
 		w.set_param_y(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_LIMIT_LOWER, base_steer_angle * this_factor)
 		w.set_param_y(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_LIMIT_UPPER, base_steer_angle * this_factor)
-					
 
-	# if steer_input:
-# for w in wheels:
-# 	if w.is_steer:
-# 		#w.set_param_y(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_LIMIT_UPPER, deg_to_rad(w.last_rot_y))
-# 		#w.set_param_y(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_LIMIT_LOWER, deg_to_rad(w.last_rot_y))
-# 		if steer_input:
-# 			w.set_param_y(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_LIMIT_LOWER, deg_to_rad(-MAX_STEER_ANGLE))
-# 			w.set_param_y(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_LIMIT_UPPER, deg_to_rad(MAX_STEER_ANGLE))
-# 		#w.rb.apply_torque(Vector3.UP * steer_input * 20) 
-# 		#w.rb.apply_torque(Vector3.UP.cross(w.rb.basis.y) * 5)
-# 		#.set_flag_y(JoltGeneric6DOFJoint3D.FLAG_ENABLE_ANGULAR_MOTOR, true)
-# 		#w.set_param_y(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_MOTOR_MAX_TORQUE, 10)
-# 		w.set_param_y(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_MOTOR_TARGET_VELOCITY, deg_to_rad(steer_input * 50))
-# 	# elif w.is_steer:
-# 		w.last_rot_y = w.rb.rotation_degrees.y
 
-# 		# if w.last_rot_y < 2 and w.last_rot_y > -178:
-# 		# 	w.last_rot_y = 0
-			
+	
 
-# 		w.set_param_y(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_SPRING_EQUILIBRIUM_POINT, deg_to_rad(w.last_rot_y))
-		# 	w.set_param_y(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_MOTOR_TARGET_VELOCITY, 0)
-
-	for w in wheels:
-		_do_wheel_accel(w, delta)
-	# else:
-	# 	for w in wheels:
-			
-	# 		if w.is_steer:
-	# 			w.set_param_y(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_LIMIT_UPPER, w.last_rot_y)
-	# 			w.set_param_y(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_LIMIT_LOWER, w.last_rot_y)
-	# 			#w.set_flag_y(JoltGeneric6DOFJoint3D.FLAG_ENABLE_ANGULAR_MOTOR, false)
-	# 			w.set_param_y(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_MOTOR_MAX_TORQUE, 0)
-	# 			w.set_param_y(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_MOTOR_TARGET_VELOCITY, 0)
-
-	# 	for wb in wheel_body:
-	# 			wb.apply_torque(Vector3.UP.cross(wb.basis.y) * 5)
-	# 			last_rotation = test.rotation.y
-
-	debug.text = str(-test.angular_velocity.dot(test.global_basis.x), '\n', test.rotation_degrees.y)#.dot(test.global_basis.z))
-	#print(wheels[0].get_param_x(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_MOTOR_TARGET_VELOCITY))
-	#for w in wheel_body:
-	#	test_accel(w)
-
+	debug.text = str(-test.angular_velocity.dot(test.global_basis.x), '\n', test.rotation_degrees.y)
 
 func _do_wheel_accel(w: JoltGeneric6DOFJoint3D, delta: float)->void:
-	w.set_param_x(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_MOTOR_TARGET_VELOCITY, -motor_input * ACCEL)
+	w.set_param_x(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_MOTOR_TARGET_VELOCITY, -throttle * ACCEL)
 	#w.rb.apply_torque(Vector3.LEFT.cross(w.rb.global_basis.x) * motor_input * ACCEL * 5)
 	#DebugDraw3D.draw_arrow(w.rb.global_position, w.rb.global_position + (w.rb.global_basis) * Vector3.LEFT * motor_input * ACCEL, Color.BLUE, .01)
 	#DebugDraw3D.draw_arrow(w.rb.global_position, w.rb.global_position + (-Vector3.UP.cross(w.rb.global_basis.y)) * motor_input *ACCEL/ 4, Color.RED, .01)
 
-	
+func _get_torque_at_rpm(cur_rpm : float)->float:
+	var rpm_factor : float = clamp(cur_rpm / MAX_RPM, 0.0, 1.0)
+	var torque_factor := TORQUE_CURVE.sample_baked(rpm_factor)
+	return torque_factor * MAX_TORQUE
+
+func _calc_vel(delta:float)->void:
+	# don't let rpm fall below idle or go above max rpm
+	_rpm = clampf(_rpm, IDLE_RPM, MAX_RPM)
+
+	var _cur_torque : float = _get_torque_at_rpm(_rpm) 
+	var _engine_torque : float = throttle * _cur_torque
+	var _gear_factor : float = GEAR_RATIOS[cur_gear] * DIFF_RATIO
+	var _wheel_rpm : float = _rpm / _gear_factor
+
+	_wheel_angular_vel = _wheel_rpm * 6 # multiply by 6 to convert to degrees/second
+	var _wheel_torque : float = _engine_torque * _gear_factor * TRANS_EFF
+
+	var _longitudinal_vel : float = -global_basis.z.dot(linear_velocity)
+
+	if is_zero_approx(absf(_longitudinal_vel)):
+		_longitudinal_vel = .01
+
+	var _slip : float = _wheel_angular_vel * WHEEL_RADIUS * _longitudinal_vel / absf(_longitudinal_vel)#(-wheels[0].rb.angular_velocity.dot(wheels[0].rb.global_basis.x)) * WHEEL_RADIUS * _longitudinal_vel / absf(_longitudinal_vel)
+	print(_slip)
+
+	var _torque_sign : float = signf(_wheel_torque)
+	_wish_wheel_torque  = _wheel_torque + -_torque_sign * 50 # (-_torque_sign * (_slip + brake * BRAKE_TORQUE))#+ traction_torque + brake_torque
+	var _inertia : float = WHEEL_MASS * (WHEEL_RADIUS * WHEEL_RADIUS) / 2 # inertia of a cylinder formula 
+
+	var _angular_accel : float = _wish_wheel_torque / _inertia
+	if signf(_angular_accel) == -1.0 :
+		breakpoint
+	_wheel_angular_vel += _angular_accel * delta 
+	_rpm = _wheel_angular_vel / 6 * _gear_factor  # convert deg/s back to rpm
+
+	for w in wheels:
+		w.set_param_x(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_MOTOR_TARGET_VELOCITY, deg_to_rad(-_wheel_angular_vel))
+		w.set_param_x(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_MOTOR_MAX_TORQUE, _wish_wheel_torque)

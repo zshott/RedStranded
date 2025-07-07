@@ -75,7 +75,6 @@ dual_scaling = true
 script = ExtResource("1_k7qca")
 
 [node name="UI" parent="." instance=ExtResource("2_nqak5")]
-visible = false
 mouse_filter = 2
 
 [node name="Environment" parent="." instance=ExtResource("3_yqldq")]
