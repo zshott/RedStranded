@@ -44,5 +44,7 @@ use_collision = true
 size = Vector3(7.98523, 1, 4)
 material = SubResource("StandardMaterial3D_lktwm")
 
-[node name="Body" parent="." instance=ExtResource("3_x4mbn")]
+[node name="Body" parent="." node_paths=PackedStringArray("wheels", "steer_wheels") instance=ExtResource("3_x4mbn")]
 transform = Transform3D(0.230712, 0, -0.973022, 0, 1, 0, 0.973022, 0, 0.230712, -6.67656, 2.19512, -1.61501)
+wheels = []
+steer_wheels = []

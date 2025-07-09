@@ -75,6 +75,7 @@ dual_scaling = true
 script = ExtResource("1_k7qca")
 
 [node name="UI" parent="." instance=ExtResource("2_nqak5")]
+visible = false
 mouse_filter = 2
 
 [node name="Environment" parent="." instance=ExtResource("3_yqldq")]
@@ -97,5 +98,5 @@ metadata/_edit_lock_ = true
 visible = false
 terrain = NodePath("..")
 
-[node name="Body" parent="." instance=ExtResource("8_egbwy")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 308.25, 103.32, 273.302)
+[node name="RockCrawler" parent="." instance=ExtResource("8_egbwy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 313.027, 100.205, 293.514)

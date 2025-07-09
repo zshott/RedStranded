@@ -28,5 +28,7 @@ environment = SubResource("Environment_7a07h")
 use_collision = true
 size = Vector3(11.4729, 1, 11.2522)
 
-[node name="Body" parent="." instance=ExtResource("1_teypx")]
+[node name="Body" parent="." node_paths=PackedStringArray("wheels", "steer_wheels") instance=ExtResource("1_teypx")]
 transform = Transform3D(-1, 8.74228e-08, 0, -8.74228e-08, -1, 0, 0, 0, 1, 0.335758, 3.58826, 0.387042)
+wheels = []
+steer_wheels = []

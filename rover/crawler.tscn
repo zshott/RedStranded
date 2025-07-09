@@ -46,13 +46,12 @@ radial_segments = 16
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_hb2ta"]
 
-[node name="Rover" type="RigidBody3D" node_paths=PackedStringArray("wheels")]
+[node name="Rover" type="RigidBody3D"]
 collision_layer = 2
 mass = 50.0
 can_sleep = false
 continuous_cd = true
 script = ExtResource("1_2vkci")
-wheels = [NodePath("Node3D/FL"), NodePath("Node3D/FR"), NodePath("Node3D/RL"), NodePath("Node3D/RR")]
 accel = 600.0
 decel = 200.0
 max_speed = 30.0

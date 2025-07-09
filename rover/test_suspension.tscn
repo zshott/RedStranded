@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3 uid="uid://cgb6gqjj7k200"]
+[gd_scene load_steps=19 format=3 uid="uid://cgb6gqjj7k200"]
 
 [ext_resource type="Script" uid="uid://c1l10syewe5ww" path="res://rover/rock_crawler.gd" id="1_gyth0"]
 [ext_resource type="PackedScene" uid="uid://1j3lg7r60apb" path="res://rover/Car6.glb" id="1_x4twm"]
@@ -11,6 +11,10 @@
 [sub_resource type="Curve" id="Curve_4kymm"]
 _data = [Vector2(0, 0.517435), 0.0, 1.90101, 0, 0, Vector2(0.748571, 1), -0.255905, 0.0, 0, 0, Vector2(1, 0.744094), -2.13255, 0.0, 0, 0]
 point_count = 3
+
+[sub_resource type="Curve" id="Curve_cttij"]
+_data = [Vector2(0, 0.151856), 0.0, -0.191929, 0, 0, Vector2(0.231429, 0.371204), 1.49798, 1.49798, 0, 0, Vector2(0.465714, 0.978065), 0.0, 0.0, 0, 0, Vector2(0.817143, 0.890326), 0.0, 0.0, 0, 0, Vector2(0.905714, 0.327334), -1.52325, 0.0, 0, 0]
+point_count = 5
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_yol4y"]
 size = Vector3(2.336, 0.492188, 6.16797)
@@ -40,23 +44,23 @@ radius = 0.1
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_cttij"]
 
-[node name="Body" type="RigidBody3D" node_paths=PackedStringArray("wheels", "steer_wheels", "axles", "wheel_body", "test", "debug")]
+[node name="RockCrawler" type="RigidBody3D" node_paths=PackedStringArray("wheels", "steer_wheels", "test", "debug")]
 collision_layer = 2
 mass = 200.0
 continuous_cd = true
 script = ExtResource("1_gyth0")
 wheels = [NodePath("Wheel6DOFs/FR_Wheel_Rotator/FR_DOF"), NodePath("Wheel6DOFs/FL_Wheel_Rotator/FL_DOF"), NodePath("Wheel6DOFs/RR_Wheel_Rotator/RR_DOF"), NodePath("Wheel6DOFs/RL_Wheel_Rotator/RL_DOF")]
 steer_wheels = [NodePath("Wheel6DOFs/FR_Wheel_Rotator/FR_DOF"), NodePath("Wheel6DOFs/FL_Wheel_Rotator/FL_DOF")]
-axles = [NodePath("Axle6DOFs/FR_Axle_Rotator/FR_AxleDOF"), NodePath("Axle6DOFs/FL_Axle_Rotator/FL_AxleDOF"), NodePath("Axle6DOFs/RR_Axle_Rotator/RR_AxleDOF"), NodePath("Axle6DOFs/RL_Axle_Rotator/RL_AxleDOF")]
-wheel_body = [NodePath("wheels/FR_Wheel"), NodePath("wheels/FL_Wheel")]
 test = NodePath("wheels/FR_Wheel")
 debug = NodePath("Control/Label")
 TORQUE_CURVE = SubResource("Curve_4kymm")
-MAX_RPM = 3000.0
-IDLE_RPM = 400.0
-MAX_TORQUE = 200.0
+MAX_RPM = 6000.0
+IDLE_RPM = 800.0
 MAX_STEER_ANGLE = 45.0
 WHEEL_FORCE_LIMIT = 1000.0
+accel = 40.0
+decel = 5.0
+a_curve = SubResource("Curve_cttij")
 
 [node name="Car62" parent="." instance=ExtResource("1_x4twm")]
 
@@ -287,7 +291,6 @@ linear_spring_y/damping = 0.8
 linear_spring_y/equilibrium_point = -0.3
 linear_spring_y/max_force = 800.0
 angular_limit_z/enabled = false
-angular_motor_x/enabled = true
 angular_spring_z/frequency = 4.0
 angular_spring_z/damping = 1.0
 angular_spring_z/max_torque = 300.0
@@ -315,7 +318,6 @@ linear_spring_y/damping = 0.8
 linear_spring_y/equilibrium_point = -0.3
 linear_spring_y/max_force = 800.0
 angular_limit_z/enabled = false
-angular_motor_x/enabled = true
 angular_spring_z/frequency = 4.0
 angular_spring_z/damping = 1.0
 angular_spring_z/max_torque = 300.0
@@ -346,7 +348,6 @@ linear_spring_y/damping = 0.8
 linear_spring_y/equilibrium_point = -0.3
 linear_spring_y/max_force = 800.0
 angular_limit_z/enabled = false
-angular_motor_x/enabled = true
 angular_spring_z/frequency = 4.0
 angular_spring_z/damping = 1.0
 angular_spring_z/max_torque = 300.0
@@ -373,7 +374,6 @@ linear_spring_y/damping = 0.8
 linear_spring_y/equilibrium_point = -0.3
 linear_spring_y/max_force = 800.0
 angular_limit_z/enabled = false
-angular_motor_x/enabled = true
 angular_spring_z/frequency = 4.0
 angular_spring_z/damping = 1.0
 angular_spring_z/max_torque = 300.0
