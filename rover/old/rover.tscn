@@ -1,7 +1,7 @@
 [gd_scene load_steps=15 format=3 uid="uid://bihgqrot8tqf2"]
 
 [ext_resource type="Texture2D" uid="uid://c8vwnx65onnvv" path="res://addons/third-person-camera/TPC-demo/kenney_prototype_textures/green/texture_09.png" id="1_sctlm"]
-[ext_resource type="Script" uid="uid://bx3cswis3puvy" path="res://rover/rover.gd" id="1_txnhi"]
+[ext_resource type="Script" uid="uid://bx3cswis3puvy" path="res://rover/old/rover.gd" id="1_txnhi"]
 [ext_resource type="Texture2D" uid="uid://b8dlw2gs1a6k" path="res://addons/third-person-camera/TPC-demo/kenney_prototype_textures/red/texture_13.png" id="2_txnhi"]
 [ext_resource type="Texture2D" uid="uid://dsawc7s1kg73n" path="res://addons/kenney_prototype_textures/dark/texture_12.png" id="5_bv2uu"]
 [ext_resource type="Script" uid="uid://cvyxaj4rpmp2j" path="res://rover/cam_spring_arm.gd" id="5_rvw6p"]

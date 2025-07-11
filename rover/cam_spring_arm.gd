@@ -27,11 +27,13 @@ func _unhandled_input(event: InputEvent) -> void:
 
 	#moving cam
 	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+		@warning_ignore_start("unsafe_property_access")
 		rotation.y -= event.relative.x * mouse_sensitivity
 		rotation.y = wrapf(rotation.y, 0.0, TAU)
 
 		rotation.x -= event.relative.y * mouse_sensitivity
 		rotation.x = clampf(rotation.x, min_vertical_angle, max_vertical_angle)
+		@warning_ignore_restore("unsafe_property_access")
 
 
 func _process(delta: float) -> void:

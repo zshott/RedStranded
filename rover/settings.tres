@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="SettingsResource" load_steps=2 format=3 uid="uid://c4fn6vrtc65lr"]
+
+[ext_resource type="Script" uid="uid://cgiwwpasba747" path="res://rover/SETTINGS_RESOURCE.gd" id="1_god8o"]
+
+[resource]
+script = ExtResource("1_god8o")
+gamepad_steer_sensitivity = 1.0
+gamepad_steer_straighten_speed = 1.0
+gamepad_throttle_sensitivity = 1.0
+gamepad_brake_sensitivity = 1.0
+gamepad_pedal_return_speed = 1.0
+KBM_steer_sensitivity = 1.0
+KBM_steer_straighten_speed = 1.0
+KBM_throttle_sensitivity = 1.0
+KBM_brake_sensitivity = 1.0
+KBM_pedal_return_speed = 1.0
+metadata/_custom_type_script = "uid://cgiwwpasba747"

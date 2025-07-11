@@ -1,23 +1,24 @@
-[gd_scene load_steps=19 format=3 uid="uid://cgb6gqjj7k200"]
+[gd_scene load_steps=20 format=3 uid="uid://cgb6gqjj7k200"]
 
 [ext_resource type="Script" uid="uid://c1l10syewe5ww" path="res://rover/rock_crawler.gd" id="1_gyth0"]
 [ext_resource type="PackedScene" uid="uid://1j3lg7r60apb" path="res://rover/Car6.glb" id="1_x4twm"]
 [ext_resource type="PackedScene" uid="uid://bl77pqgagy1ph" path="res://rover/Car_wheel.glb" id="2_e6aj7"]
+[ext_resource type="Resource" uid="uid://c4fn6vrtc65lr" path="res://rover/settings.tres" id="2_io7wc"]
 [ext_resource type="Script" uid="uid://bymq2io82bv2x" path="res://rover/wheel.gd" id="3_4kymm"]
 [ext_resource type="Script" uid="uid://cvyxaj4rpmp2j" path="res://rover/cam_spring_arm.gd" id="4_j6q7d"]
 [ext_resource type="Script" uid="uid://s3l5qdnrc0qa" path="res://rover/camera_follow.gd" id="5_4kymm"]
 [ext_resource type="Script" uid="uid://75xc5j2oh85r" path="res://rover/debug_ui.gd" id="7_cttij"]
 
-[sub_resource type="Curve" id="Curve_4kymm"]
-_data = [Vector2(0, 0.517435), 0.0, 1.90101, 0, 0, Vector2(0.748571, 1), -0.255905, 0.0, 0, 0, Vector2(1, 0.744094), -2.13255, 0.0, 0, 0]
-point_count = 3
-
 [sub_resource type="Curve" id="Curve_cttij"]
 _data = [Vector2(0, 0.151856), 0.0, -0.191929, 0, 0, Vector2(0.231429, 0.371204), 1.49798, 1.49798, 0, 0, Vector2(0.465714, 0.978065), 0.0, 0.0, 0, 0, Vector2(0.817143, 0.890326), 0.0, 0.0, 0, 0, Vector2(0.905714, 0.327334), -1.52325, 0.0, 0, 0]
 point_count = 5
 
+[sub_resource type="Curve" id="Curve_io7wc"]
+_data = [Vector2(0, 0), 0.0, 0.346457, 0, 0, Vector2(0.717143, 0.473566), 1.2523, 1.2523, 0, 0, Vector2(1, 1), 0.965681, 0.0, 0, 0]
+point_count = 3
+
 [sub_resource type="BoxShape3D" id="BoxShape3D_yol4y"]
-size = Vector3(2.336, 0.492188, 6.16797)
+size = Vector3(2.336, 1.01691, 6.16797)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_j6q7d"]
 size = Vector3(2.336, 0.740173, 0.566772)
@@ -49,23 +50,24 @@ collision_layer = 2
 mass = 200.0
 continuous_cd = true
 script = ExtResource("1_gyth0")
+SETTINGS = ExtResource("2_io7wc")
 wheels = [NodePath("Wheel6DOFs/FR_Wheel_Rotator/FR_DOF"), NodePath("Wheel6DOFs/FL_Wheel_Rotator/FL_DOF"), NodePath("Wheel6DOFs/RR_Wheel_Rotator/RR_DOF"), NodePath("Wheel6DOFs/RL_Wheel_Rotator/RL_DOF")]
 steer_wheels = [NodePath("Wheel6DOFs/FR_Wheel_Rotator/FR_DOF"), NodePath("Wheel6DOFs/FL_Wheel_Rotator/FL_DOF")]
 test = NodePath("wheels/FR_Wheel")
-debug = NodePath("Control/Label")
-TORQUE_CURVE = SubResource("Curve_4kymm")
-MAX_RPM = 6000.0
-IDLE_RPM = 800.0
-MAX_STEER_ANGLE = 45.0
-WHEEL_FORCE_LIMIT = 1000.0
-accel = 40.0
+debug = NodePath("Control")
+max_speed = 20.0
+accel = 30.0
 decel = 5.0
-a_curve = SubResource("Curve_cttij")
+accel_curve = SubResource("Curve_cttij")
+brake_curve = SubResource("Curve_io7wc")
+drag_coeff = 0.2
+engine_brake_coeff = 2.0
+MAX_STEER_ANGLE = 45.0
 
 [node name="Car62" parent="." instance=ExtResource("1_x4twm")]
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.01474, 0.867564, -0.0551758)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.01474, 1.12992, -0.0551758)
 shape = SubResource("BoxShape3D_yol4y")
 
 [node name="CollisionShape3D2" type="CollisionShape3D" parent="."]

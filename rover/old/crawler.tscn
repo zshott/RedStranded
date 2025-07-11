@@ -1,9 +1,9 @@
 [gd_scene load_steps=18 format=3 uid="uid://ioddjcf43fsl"]
 
-[ext_resource type="Script" uid="uid://b3htes01ovluq" path="res://rover/crawler.gd" id="1_2vkci"]
+[ext_resource type="Script" uid="uid://b3htes01ovluq" path="res://rover/old/crawler.gd" id="1_2vkci"]
 [ext_resource type="Texture2D" uid="uid://dmc3jod7kbtrk" path="res://addons/kenney_prototype_textures/orange/texture_01.png" id="2_2vkci"]
 [ext_resource type="Texture2D" uid="uid://b8dlw2gs1a6k" path="res://addons/third-person-camera/TPC-demo/kenney_prototype_textures/red/texture_13.png" id="3_80l3l"]
-[ext_resource type="Script" uid="uid://b8pb71l08utxm" path="res://rover/wheel_old.gd" id="4_6c06o"]
+[ext_resource type="Script" uid="uid://b8pb71l08utxm" path="res://rover/old/wheel_old.gd" id="4_6c06o"]
 [ext_resource type="Texture2D" uid="uid://dsawc7s1kg73n" path="res://addons/kenney_prototype_textures/dark/texture_12.png" id="5_0f05d"]
 [ext_resource type="Script" uid="uid://cvyxaj4rpmp2j" path="res://rover/cam_spring_arm.gd" id="6_067ea"]
 [ext_resource type="Script" uid="uid://s3l5qdnrc0qa" path="res://rover/camera_follow.gd" id="7_5n36f"]

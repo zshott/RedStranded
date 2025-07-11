@@ -6,6 +6,7 @@ extends Node
 
 func _ready()->void:
 	if not Engine.is_editor_hint() and has_node("UI"):
+		@warning_ignore("unsafe_property_access")
 		$UI.player = $Player
 
 	# Load Sky3D into the demo environment if enabled
