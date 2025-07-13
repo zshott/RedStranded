@@ -1,6 +1,7 @@
 extends Node3D
 class_name SpringArmPivot
 
+@export var settings : SettingsResource
 @export var mouse_sensitivity : float = .01
 @export_range(-90.0, 0.0, 0.1, "radians_as_degrees") var min_vertical_angle : float = -PI/2
 @export_range(0.0, 90.0, 0.1, "radians_as_degrees") var max_vertical_angle : float = PI/4
@@ -8,9 +9,9 @@ class_name SpringArmPivot
 
 @export var spring_arm : SpringArm3D
 
-const JOY_DEADZONE = 0.2
-const JOY_AXIS_RESCALE = 1.0/(1.0-JOY_DEADZONE)
-const JOY_ROTATION_MULTIPLIER = 200.0 * PI / 180.0
+# const settings.joystick_deadzone = 0.2
+# const settings.joy_axis_rescale = 1.0/(1.0-settings.joystick_deadzone)
+# const settings.joy_rotation_multiplier = 200.0 * PI / 180.0
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("left_click"):
@@ -41,20 +42,20 @@ func _process(delta: float) -> void:
 		return		
 		
 	var xAxis := Input.get_joy_axis(0, JOY_AXIS_RIGHT_X)
-	if abs(xAxis) > JOY_DEADZONE:
+	if abs(xAxis) > settings.joystick_deadzone:
 		if xAxis >0:
-			xAxis = (xAxis-JOY_DEADZONE) * JOY_AXIS_RESCALE
+			xAxis = (xAxis-settings.joystick_deadzone) * settings.joy_axis_rescale
 		else:
-			xAxis = (xAxis+JOY_DEADZONE) * JOY_AXIS_RESCALE
-		rotation.y -= xAxis * delta * JOY_ROTATION_MULTIPLIER
+			xAxis = (xAxis+settings.joystick_deadzone) * settings.joy_axis_rescale
+		rotation.y -= xAxis * delta * settings.joy_rotation_multiplier
 		rotation.y = wrapf(rotation.y, 0.0, TAU)
 		
 	var yAxis := Input.get_joy_axis(0, JOY_AXIS_RIGHT_Y)
-	if abs(yAxis) > JOY_DEADZONE:
+	if abs(yAxis) > settings.joystick_deadzone:
 		if yAxis >0:
-			yAxis = (yAxis-JOY_DEADZONE) * JOY_AXIS_RESCALE
+			yAxis = (yAxis-settings.joystick_deadzone) * settings.joy_axis_rescale
 		else:
-			yAxis = (yAxis+JOY_DEADZONE) * JOY_AXIS_RESCALE
+			yAxis = (yAxis+settings.joystick_deadzone) * settings.joy_axis_rescale
 		
-		rotation.x -= yAxis * delta * JOY_ROTATION_MULTIPLIER/2
+		rotation.x -= yAxis * delta * settings.joy_rotation_multiplier/2
 		rotation.x = clampf(rotation.x, min_vertical_angle, max_vertical_angle)

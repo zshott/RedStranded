@@ -4,8 +4,9 @@
 
 [resource]
 script = ExtResource("1_god8o")
-gamepad_steer_sensitivity = 1.0
-gamepad_steer_straighten_speed = 1.0
+joystick_deadzone = 0.2
+gamepad_steer_sensitivity = 0.03
+gamepad_steer_straighten_speed = 0.8
 gamepad_throttle_sensitivity = 1.0
 gamepad_brake_sensitivity = 1.0
 gamepad_pedal_return_speed = 1.0

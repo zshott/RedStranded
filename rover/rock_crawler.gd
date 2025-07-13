@@ -32,6 +32,7 @@ class_name RockCrawler
 @export_group("Steering")
 @export_range(0.0, 90.0, 0.1) var MAX_STEER_ANGLE : float = 180
 @export var inner_wheel_steering_angle_factor : float = 1.33
+@export var do_wheel_straighten : bool = false
 
 
 ## player throttle input
@@ -51,7 +52,7 @@ static var INPUT_SCHEME := INPUT_SCHEMES.KBM
 
 func _physics_process(delta: float) -> void:
 	
-	_gather_input()
+	_gather_input(delta)
 	
 
 	var base_steer_angle : float = deg_to_rad(steer_input * MAX_STEER_ANGLE)
@@ -84,7 +85,7 @@ func _physics_process(delta: float) -> void:
 	_vel -= total_decel * delta	
 	_vel = clampf(_vel, 0, max_speed) # don't let velocity go below 0, or we will begin to move backwards when not accelerating
 
-	var drive_torque : float = throttle * max_drive_torque
+	var drive_torque : float = max_drive_torque#throttle * max_drive_torque
 	var brake_factor : float = brake_curve.sample_baked(brake_input)
 	var brake_torque : float = brake_factor * max_brake_torque
 
@@ -111,10 +112,40 @@ func _physics_process(delta: float) -> void:
 
 
 
-func _gather_input()->void:
-	throttle = Input.get_action_strength("throttle")
-	brake_input = Input.get_action_strength("brake")
-	steer_input = Input.get_axis("steer_left", "steer_right")
+func _gather_input(delta: float)->void:
+	var raw_throttle : float = Input.get_action_strength("throttle")
+	var raw_brake_input : float= Input.get_action_strength("brake")
+	
+
+	if INPUT_SCHEME == INPUT_SCHEMES.GAMEPAD:
+		var raw_steer_input : float = Input.get_joy_axis(0, JOY_AXIS_LEFT_X)
+		if absf(raw_steer_input) > SETTINGS.joystick_deadzone: 
+			#we need to differentiate between pos/neg movement or else raw_steer_input will effectively be not be able to be pos/neg
+			if raw_steer_input > 0:
+				# rescale so joyaxis scale is from 0-1 again
+				raw_steer_input = (raw_steer_input - SETTINGS.joystick_deadzone) * SETTINGS.joy_axis_rescale 
+			elif raw_steer_input < 0:
+				# rescale so joyaxis scale is from 0-1 again
+				raw_steer_input = (raw_steer_input + SETTINGS.joystick_deadzone) * SETTINGS.joy_axis_rescale
+
+			steer_input += raw_steer_input * SETTINGS.gamepad_steer_sensitivity
+			steer_input = clampf(steer_input, -1.0, 1.0)
+
+		if do_wheel_straighten:
+			# if absf(steer_input) < 0.05:
+			# 	steer_input = 0.0
+			if steer_input > 0.0:
+				steer_input -= SETTINGS.gamepad_steer_straighten_speed * delta
+				steer_input = clampf(steer_input, 0, 1.0)
+			elif steer_input < 0.0:
+				steer_input += SETTINGS.gamepad_steer_straighten_speed * delta
+				steer_input = clampf(steer_input, -1.0, 0.0)
+
+			#print(move_toward(steer_input, 0.0, SETTINGS.gamepad_steer_straighten_speed * delta))
+			#steer_input -= move_toward(steer_input, 0.0, SETTINGS.gamepad_steer_straighten_speed* delta) # return steering to 0 to straighten out
+
+	throttle = raw_throttle
+	brake_input = raw_brake_input
 
 	
 func _input(event: InputEvent) -> void:
@@ -123,9 +154,14 @@ func _input(event: InputEvent) -> void:
 		if INPUT_SCHEME != INPUT_SCHEMES.KBM:
 			_set_input_scheme(INPUT_SCHEMES.KBM)
 	#gamepad
-	elif event is InputEventJoypadButton or event is InputEventJoypadMotion:
+	elif event is InputEventJoypadButton: 
 		if INPUT_SCHEME != INPUT_SCHEMES.GAMEPAD:
 			_set_input_scheme(INPUT_SCHEMES.GAMEPAD)
+	elif event is InputEventJoypadMotion:
+		#prevents switching input modes very quickly if there is stickdrift
+		if event.axis_value > SETTINGS.joystick_deadzone:
+			if INPUT_SCHEME != INPUT_SCHEMES.GAMEPAD:
+				_set_input_scheme(INPUT_SCHEMES.GAMEPAD)
 
 func _set_input_scheme(scheme: INPUT_SCHEMES)->void:
 	INPUT_SCHEME = scheme 

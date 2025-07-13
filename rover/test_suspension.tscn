@@ -63,6 +63,7 @@ brake_curve = SubResource("Curve_io7wc")
 drag_coeff = 0.2
 engine_brake_coeff = 2.0
 MAX_STEER_ANGLE = 45.0
+do_wheel_straighten = true
 
 [node name="Car62" parent="." instance=ExtResource("1_x4twm")]
 
@@ -291,7 +292,7 @@ linear_spring_y/enabled = true
 linear_spring_y/frequency = 15.0
 linear_spring_y/damping = 0.8
 linear_spring_y/equilibrium_point = -0.3
-linear_spring_y/max_force = 800.0
+linear_spring_y/max_force = 1000.0
 angular_limit_z/enabled = false
 angular_spring_z/frequency = 4.0
 angular_spring_z/damping = 1.0
@@ -318,7 +319,7 @@ linear_spring_y/enabled = true
 linear_spring_y/frequency = 15.0
 linear_spring_y/damping = 0.8
 linear_spring_y/equilibrium_point = -0.3
-linear_spring_y/max_force = 800.0
+linear_spring_y/max_force = 1000.0
 angular_limit_z/enabled = false
 angular_spring_z/frequency = 4.0
 angular_spring_z/damping = 1.0
@@ -348,7 +349,7 @@ linear_spring_y/enabled = true
 linear_spring_y/frequency = 15.0
 linear_spring_y/damping = 0.8
 linear_spring_y/equilibrium_point = -0.3
-linear_spring_y/max_force = 800.0
+linear_spring_y/max_force = 1000.0
 angular_limit_z/enabled = false
 angular_spring_z/frequency = 4.0
 angular_spring_z/damping = 1.0
@@ -374,7 +375,7 @@ linear_spring_y/enabled = true
 linear_spring_y/frequency = 15.0
 linear_spring_y/damping = 0.8
 linear_spring_y/equilibrium_point = -0.3
-linear_spring_y/max_force = 800.0
+linear_spring_y/max_force = 1000.0
 angular_limit_z/enabled = false
 angular_spring_z/frequency = 4.0
 angular_spring_z/damping = 1.0
@@ -387,6 +388,7 @@ rb = NodePath("../../../wheels/RL_Wheel")
 [node name="SpringArmPivot" type="Node3D" parent="." node_paths=PackedStringArray("spring_arm")]
 transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0.0067967, 1.60162, -0.11183)
 script = ExtResource("4_j6q7d")
+settings = ExtResource("2_io7wc")
 max_vertical_angle = 1.5708
 spring_arm = NodePath("SpringArm3D")
 
