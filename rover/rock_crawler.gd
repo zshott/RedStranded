@@ -90,13 +90,15 @@ func _physics_process(delta: float) -> void:
 	var brake_torque : float = brake_factor * max_brake_torque
 
 	var target_vel : float = -_vel
+	var target_torque : float = drive_torque
 	if brake_input > 0.0:
-		target_vel = 0.0
+			target_vel = 0.0
+			target_torque = brake_torque
 
 	for w in wheels:
 		if throttle > 0.0:
 			# apply forces as normal
-			w.set_param_x(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_MOTOR_MAX_TORQUE, drive_torque + brake_torque)
+			w.set_param_x(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_MOTOR_MAX_TORQUE, target_torque)
 			w.set_param_x(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_MOTOR_TARGET_VELOCITY, target_vel)
 		else:
 			# no throttle, so let wheels carry momentum and roll freely
@@ -113,11 +115,11 @@ func _physics_process(delta: float) -> void:
 
 
 func _gather_input(delta: float)->void:
-	var raw_throttle : float = Input.get_action_strength("throttle")
-	var raw_brake_input : float= Input.get_action_strength("brake")
-	
 
+	
+	### GAMEPAD STEERING ###
 	if INPUT_SCHEME == INPUT_SCHEMES.GAMEPAD:
+		### STEERING ###
 		var raw_steer_input : float = Input.get_joy_axis(0, JOY_AXIS_LEFT_X)
 		if absf(raw_steer_input) > SETTINGS.joystick_deadzone: 
 			#we need to differentiate between pos/neg movement or else raw_steer_input will effectively be not be able to be pos/neg
@@ -130,10 +132,9 @@ func _gather_input(delta: float)->void:
 
 			steer_input += raw_steer_input * SETTINGS.gamepad_steer_sensitivity
 			steer_input = clampf(steer_input, -1.0, 1.0)
-
+		### STEER STRAIGHTEN ###
 		if do_wheel_straighten:
-			# if absf(steer_input) < 0.05:
-			# 	steer_input = 0.0
+			#TODO steering make break if straigten speed is > steer sensitivity
 			if steer_input > 0.0:
 				steer_input -= SETTINGS.gamepad_steer_straighten_speed * delta
 				steer_input = clampf(steer_input, 0, 1.0)
@@ -141,11 +142,45 @@ func _gather_input(delta: float)->void:
 				steer_input += SETTINGS.gamepad_steer_straighten_speed * delta
 				steer_input = clampf(steer_input, -1.0, 0.0)
 
-			#print(move_toward(steer_input, 0.0, SETTINGS.gamepad_steer_straighten_speed * delta))
-			#steer_input -= move_toward(steer_input, 0.0, SETTINGS.gamepad_steer_straighten_speed* delta) # return steering to 0 to straighten out
+	### KBM STEERING ###
+	if INPUT_SCHEME == INPUT_SCHEMES.KBM:
+		var raw_steer_input : float = Input.get_axis("steer_left", "steer_right") * SETTINGS.KBM_steer_sensitivity
+		steer_input += raw_steer_input
+		steer_input = clampf(steer_input, -1.0, 1.0)
 
-	throttle = raw_throttle
-	brake_input = raw_brake_input
+		### STEER STRAIGHTEN ###
+		if do_wheel_straighten:
+				#TODO steering make break if straigten speed is > steer sensitivity
+				if steer_input > 0.0:
+					steer_input -= SETTINGS.KBM_steer_straighten_speed * delta
+					steer_input = clampf(steer_input, 0, 1.0)
+				elif steer_input < 0.0:
+					steer_input += SETTINGS.KBM_steer_straighten_speed * delta
+					steer_input = clampf(steer_input, -1.0, 0.0)
+
+	throttle = Input.get_action_strength("throttle")
+	brake_input = Input.get_action_strength("brake")
+		### THROTTLE ###
+		# var raw_throttle_input : float = Input.get_action_strength("throttle") * SETTINGS.gamepad_throttle_sensitivity
+		# throttle += raw_throttle_input
+		# throttle = clampf(throttle, 0.0, 1.0)
+		
+		# ## return brake input back to 0
+		# # throttle -= SETTINGS.gamepad_pedal_return_speed * delta
+		# # throttle = clampf(throttle, 0.0, 1.0)
+
+		# ### BRAKING ###
+		# var raw_brake_input : float = Input.get_action_strength("brake") * SETTINGS.gamepad_brake_sensitivity
+		# brake_input += raw_brake_input
+		# brake_input = clampf(brake_input, 0.0, 1.0)
+		# ## return brake input back to 0
+		# brake_input -= SETTINGS.gamepad_pedal_return_speed * delta
+		# brake_input = clampf(brake_input, 0.0, 1.0)
+
+
+
+
+
 
 	
 func _input(event: InputEvent) -> void:
