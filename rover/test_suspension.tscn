@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3 uid="uid://cgb6gqjj7k200"]
+[gd_scene load_steps=21 format=3 uid="uid://cgb6gqjj7k200"]
 
 [ext_resource type="Script" uid="uid://c1l10syewe5ww" path="res://rover/rock_crawler.gd" id="1_gyth0"]
 [ext_resource type="PackedScene" uid="uid://1j3lg7r60apb" path="res://rover/Car6.glb" id="1_x4twm"]
@@ -16,6 +16,11 @@ point_count = 5
 [sub_resource type="Curve" id="Curve_io7wc"]
 _data = [Vector2(0, 0), 0.0, 0.346457, 0, 0, Vector2(0.717143, 0.473566), 1.2523, 1.2523, 0, 0, Vector2(1, 1), 0.965681, 0.0, 0, 0]
 point_count = 3
+
+[sub_resource type="Curve" id="Curve_kyh8j"]
+_data = [Vector2(0, 0.199883), 0.0, 1.94911, 0, 0, Vector2(0.2, 0.7), 3.08557, 2.8133, 0, 0, Vector2(0.360947, 1), 0.41363, 0.41363, 0, 0, Vector2(0.502959, 0.946659), -0.578059, -0.488466, 0, 0, Vector2(0.7, 0.8), -1.6499, -2.42791, 0, 0, Vector2(1, 0.298945), 0.0, 0.0, 0, 0]
+point_count = 6
+metadata/_snap_enabled = true
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_yol4y"]
 size = Vector3(2.336, 1.01691, 6.16797)
@@ -61,8 +66,9 @@ decel = 500.0
 accel_curve = SubResource("Curve_cttij")
 brake_curve = SubResource("Curve_io7wc")
 max_brake_torque = 100.0
-drag_coeff = 0.2
+drag_coeff = 1.5
 engine_brake_coeff = 2.0
+TORQUE_CURVE = SubResource("Curve_kyh8j")
 MAX_STEER_ANGLE = 45.0
 do_wheel_straighten = true
 
