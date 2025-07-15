@@ -11,3 +11,4 @@ func _process(_delta: float) -> void:
 		label.text += "\nSteer: " + str(crawler.steer_input).left(5)
 		label.text += "\nThrottle: " + str(crawler.throttle).left(5)
 		label.text += "\nBrake: " + str(crawler.brake_input).left(5)
+		label.text += "\nGear: " + str(crawler.cur_gear)

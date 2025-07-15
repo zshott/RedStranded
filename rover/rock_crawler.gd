@@ -12,14 +12,14 @@ class_name RockCrawler
 
 @export_group("Drivetrain")
 ## max speed of wheel
-@export var max_speed : float = 12.0
+@export var max_speeds : Array[float] = [18.0, 20.0, 45.0]
 ## how fast wheels accelerate
-@export var accel : float = 2.0
+@export var accelerations : Array[float] = [30, 30, 60]
 @export var decel : float = .3
 ## accelration curve of car
 @export var accel_curve : Curve
 @export var brake_curve : Curve
-@export var max_drive_torque : float = 800
+@export var max_drive_torques : Array[float] = [800, 800, 425]
 @export var max_brake_torque : float = 300
 @export var rolling_resist_coeff : float = 0.015   # ~1.5% of weight force
 @export var drag_coeff : float =  0.35              # Higher for boxy cars, lower for sports cars
@@ -34,17 +34,21 @@ class_name RockCrawler
 @export var inner_wheel_steering_angle_factor : float = 1.33
 @export var do_wheel_straighten : bool = false
 
+## Gears
+enum GEAR {REVERSE, FIRST, SECOND}
+var cur_gear : int = GEAR.FIRST
 
-## player throttle input
+var max_speed : float = max_speeds[cur_gear]
+var max_drive_torque : float = max_drive_torques[cur_gear]
+var accel : float = accelerations[cur_gear]
+var gear_sign : int = -1
+## player input
 var throttle : float = 0
 var brake_input : float = 0
 var steer_input : float = 0
 
 var _vel : float = 0.0 # working var for wheel angular velocity, based off throttle
 
-## Gears
-enum GEARS {REVERSE, FIRST, SECOND}
-var cur_gear : int = GEARS.FIRST
 
 enum INPUT_SCHEMES {KBM, GAMEPAD}
 static var INPUT_SCHEME := INPUT_SCHEMES.KBM
@@ -89,8 +93,8 @@ func _physics_process(delta: float) -> void:
 	var brake_factor : float = brake_curve.sample_baked(brake_input)
 	var brake_torque : float = brake_factor * max_brake_torque
 
-	var target_vel : float = -_vel
-	var target_torque : float = drive_torque
+	var target_vel : float = _vel * gear_sign 
+	var target_torque : float = drive_torque# if throttle > 0.01 else brake_torque
 	if brake_input > 0.0:
 			target_vel = 0.0
 			target_torque = brake_torque
@@ -99,7 +103,7 @@ func _physics_process(delta: float) -> void:
 		if throttle > 0.0:
 			# apply forces as normal
 			w.set_param_x(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_MOTOR_MAX_TORQUE, target_torque)
-			w.set_param_x(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_MOTOR_TARGET_VELOCITY, target_vel)
+			w.set_param_x(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_MOTOR_TARGET_VELOCITY, deg_to_rad(target_vel))
 		else:
 			# no throttle, so let wheels carry momentum and roll freely
 			w.set_param_x(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_MOTOR_TARGET_VELOCITY, 0.0)
@@ -108,9 +112,9 @@ func _physics_process(delta: float) -> void:
 
 			# torque values need to be swapped when in reverse 
 			if angular_vel < 0.0:
-				w.set_param_x(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_MOTOR_MAX_TORQUE, back_roll_torque) # rolling bacwards, so increase rolling resistance b/c we have to turn the whole drivetrain/wheels
+				w.set_param_x(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_MOTOR_MAX_TORQUE, back_roll_torque + brake_torque) # rolling bacwards, so increase rolling resistance b/c we have to turn the whole drivetrain/wheels
 			else:
-				w.set_param_x(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_MOTOR_MAX_TORQUE, foward_roll_torque) # rolling fowards
+				w.set_param_x(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_MOTOR_MAX_TORQUE, foward_roll_torque + brake_torque) # rolling fowards
 
 
 
@@ -135,12 +139,13 @@ func _gather_input(delta: float)->void:
 		### STEER STRAIGHTEN ###
 		if do_wheel_straighten:
 			#TODO steering make break if straigten speed is > steer sensitivity
-			if steer_input > 0.0:
-				steer_input -= SETTINGS.gamepad_steer_straighten_speed * delta
-				steer_input = clampf(steer_input, 0, 1.0)
-			elif steer_input < 0.0:
-				steer_input += SETTINGS.gamepad_steer_straighten_speed * delta
-				steer_input = clampf(steer_input, -1.0, 0.0)
+			if absf(raw_steer_input) - SETTINGS.joystick_deadzone < 0.01:
+				if steer_input > 0.0:
+					steer_input -= SETTINGS.gamepad_steer_straighten_speed * delta
+					steer_input = clampf(steer_input, 0, 1.0)
+				elif steer_input < 0.0:
+					steer_input += SETTINGS.gamepad_steer_straighten_speed * delta
+					steer_input = clampf(steer_input, -1.0, 0.0)
 
 	### KBM STEERING ###
 	if INPUT_SCHEME == INPUT_SCHEMES.KBM:
@@ -150,6 +155,7 @@ func _gather_input(delta: float)->void:
 
 		### STEER STRAIGHTEN ###
 		if do_wheel_straighten:
+			if absf(raw_steer_input) < 0.01:
 				#TODO steering make break if straigten speed is > steer sensitivity
 				if steer_input > 0.0:
 					steer_input -= SETTINGS.KBM_steer_straighten_speed * delta
@@ -160,25 +166,28 @@ func _gather_input(delta: float)->void:
 
 	throttle = Input.get_action_strength("throttle")
 	brake_input = Input.get_action_strength("brake")
-		### THROTTLE ###
-		# var raw_throttle_input : float = Input.get_action_strength("throttle") * SETTINGS.gamepad_throttle_sensitivity
-		# throttle += raw_throttle_input
-		# throttle = clampf(throttle, 0.0, 1.0)
-		
-		# ## return brake input back to 0
-		# # throttle -= SETTINGS.gamepad_pedal_return_speed * delta
-		# # throttle = clampf(throttle, 0.0, 1.0)
 
-		# ### BRAKING ###
-		# var raw_brake_input : float = Input.get_action_strength("brake") * SETTINGS.gamepad_brake_sensitivity
-		# brake_input += raw_brake_input
-		# brake_input = clampf(brake_input, 0.0, 1.0)
-		# ## return brake input back to 0
-		# brake_input -= SETTINGS.gamepad_pedal_return_speed * delta
-		# brake_input = clampf(brake_input, 0.0, 1.0)
+	if Input.is_action_just_pressed("shift_up"):
+		var new_gear : int = cur_gear + 1
+		if new_gear < GEAR.size():
+			_change_gear(new_gear)
 
+	if Input.is_action_just_pressed("shift_down"):
+		var new_gear : int = cur_gear - 1
+		if new_gear >= 0:
+			_change_gear(new_gear)
+	
 
+func _change_gear(new_gear: GEAR)->void:
+	cur_gear = new_gear
+	max_speed = max_speeds[cur_gear]
+	max_drive_torque = max_drive_torques[cur_gear]
+	accel = accelerations[cur_gear]
 
+	if new_gear == 0:
+		gear_sign = 1
+	else:
+		gear_sign = -1
 
 
 
