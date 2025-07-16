@@ -42,7 +42,7 @@ class_name RockCrawler
 ## Torque applied by the brakes, it is a contstant torque
 @export var BRAKE_TORQUE : float = 30
 ## Gear ratios, from Reverse->First->Second, etc.
-@export var GEAR_RATIOS : Array[float] = [2.0, 2.66, 2.1]
+@export var GEAR_RATIOS : Array[float] = [2.0, 3.42, 2.1]
 ## Differential ratio
 @export var DIFF_RATIO : float = 3.4 
 ## Transmission efficiency, must be between 0.0 and 1.0
@@ -70,6 +70,8 @@ var max_speed : float = max_speeds[cur_gear]
 var max_drive_torque : float = max_drive_torques[cur_gear]
 var accel : float = accelerations[cur_gear]
 var gear_sign : int = -1
+var torque_output : float = 0.0
+var is_redline : bool = false
 ## player input
 var throttle : float = 0
 var brake_input : float = 0
@@ -100,70 +102,37 @@ func _physics_process(delta: float) -> void:
 		w.set_param_y(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_LIMIT_LOWER, base_steer_angle * turn_factor)
 		w.set_param_y(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_LIMIT_UPPER, base_steer_angle * turn_factor)
 
-
-	var gear_factor : float = GEAR_RATIOS[cur_gear] * DIFF_RATIO
-
-	# Get engine torque at current RPM
-	var cur_torque: float = _get_torque_at_rpm(_rpm)
-	var engine_torque: float = throttle * cur_torque
-
-
-	# Convert RPM to wheel angular velocity in radians/sec
-	var wheel_rpm: float = _rpm / gear_factor
-	_vel = wheel_rpm * TAU / 60.0  # TAU = 2*PI
-
-	# Effective torque to the wheel
-	var wheel_torque: float = engine_torque * gear_factor * TRANS_EFF
-	#print(wheel_torque)
-
-	# Vehicle longitudinal velocity
-	var longitudinal_vel : float = -global_basis.z.dot(linear_velocity)
-	if is_zero_approx(absf(longitudinal_vel)):
-		longitudinal_vel = 0.01
-
-	# Calculate wheel surface speed
-	var wheel_surface_speed : float = _vel * WHEEL_RADIUS
-
-	# Calculate slip (wheel speed - vehicle speed)
-	var slip : float = wheel_surface_speed - longitudinal_vel
-	#print("Slip:", slip)
-
-	# Resistance (engine brake + rolling resistance)
-	var engine_brake : float = (1.0 - throttle) * ENGINE_BRAKE_COEFF
-	var rolling_resistance : float = _vel * ROLLING_RESIST_COEFF
-	var air_drag : float = drag_coeff * _vel * _vel
-	var total_resistance : float = engine_brake + rolling_resistance + air_drag
-
+	var drag_torque := _rpm * .005#motor_drag
+	torque_output = _get_torque_at_rpm(_rpm) * throttle
+	## Adjust torque based on throttle input, clutch input, and motor drag
+	torque_output -= drag_torque #* (1.0 + (clutch_amount * (1.0 - throttle_amount)))
 	
-	var wish_wheel_torque : float = wheel_torque - total_resistance
-
-
-	print("Torque: " , wheel_torque , " | Resist: " , total_resistance, " | Total: ", wish_wheel_torque)
-
-	# Moment of inertia for a solid cylinder
-	var _inertia : float = WHEEL_MASS * (WHEEL_RADIUS * WHEEL_RADIUS) * 2
-
-	# Apply angular acceleration
-	var angular_accel : float = wish_wheel_torque / _inertia
-	_vel += angular_accel * delta
-
-	# Convert back to engine RPM
-	_rpm = _vel * 60.0 / TAU * gear_factor
-
-	if wish_wheel_torque < 0.0: # if torque isn't negative for angualar_accel calulations, rpm will never go down
-		wish_wheel_torque = 0.0
-
-	# Clamp RPM to realistic bounds at the END
-	_rpm = clampf(_rpm, IDLE_RPM, MAX_RPM)
+	## Prevent motor from outputting torque below idle or far beyond redline
+	var new_rpm := _rpm
+	new_rpm += (60.0 / TAU) * delta * torque_output / .5 #moter_inertia
+	is_redline = false
+	if new_rpm > MAX_RPM * 1.1 or new_rpm <= IDLE_RPM:
+		torque_output = 0.0
+		if new_rpm > MAX_RPM * 1.1:
+			is_redline = true
 	
+	_rpm += (60.0 / TAU) * delta * (torque_output - drag_torque) / .5 #motor_inertia
+	
+	## Disengage clutch when near idle
+	# if motor_rpm < idle_rpm + 100:
+	# 	need_clutch = true
+	# elif new_rpm > maxf(clutch_out_rpm, idle_rpm):
+	# 	need_clutch = false
+	
+	_rpm = maxf(_rpm, IDLE_RPM)
 
+	var target_vel := _rpm * TAU / 60.0 
 	for w in wheels:
-		w.set_param_x(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_MOTOR_TARGET_VELOCITY, _vel * gear_sign)
-		w.set_param_x(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_MOTOR_MAX_TORQUE, wish_wheel_torque)
-	
+		w.set_param_x(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_MOTOR_TARGET_VELOCITY, target_vel * gear_sign)
+		w.set_param_x(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_MOTOR_MAX_TORQUE, torque_output * GEAR_RATIOS[cur_gear] * DIFF_RATIO)
 
 func _get_torque_at_rpm(cur_rpm : float)->float:
-	var rpm_factor : float = clamp(cur_rpm / MAX_RPM, 0.0, 1.0)
+	var rpm_factor : float = clampf((cur_rpm - IDLE_RPM) / MAX_RPM, 0.0, 1.0)
 	var torque_factor := TORQUE_CURVE.sample_baked(rpm_factor)
 	return torque_factor * MAX_TORQUE
 
@@ -306,3 +275,67 @@ func _simple_accel(delta: float)->void:
 				w.set_param_x(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_MOTOR_MAX_TORQUE, back_roll_torque + brake_torque) # rolling bacwards, so increase rolling resistance b/c we have to turn the whole drivetrain/wheels
 			else:
 				w.set_param_x(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_MOTOR_MAX_TORQUE, foward_roll_torque + brake_torque) # rolling fowards
+
+func grrrr(delta: float)->void:
+	var gear_factor : float = GEAR_RATIOS[cur_gear] * DIFF_RATIO
+
+	# Get engine torque at current RPM
+	var cur_torque: float = _get_torque_at_rpm(_rpm)
+	var engine_torque: float = throttle * cur_torque
+
+
+	# Convert RPM to wheel angular velocity in radians/sec
+	var wheel_rpm: float = _rpm / gear_factor
+	_vel = wheel_rpm * TAU / 60.0  # TAU = 2*PI
+
+	# Effective torque to the wheel
+	var wheel_torque: float = engine_torque * gear_factor * TRANS_EFF
+	#print(wheel_torque)
+
+	# Vehicle longitudinal velocity
+	var longitudinal_vel : float = -global_basis.z.dot(linear_velocity)
+	if is_zero_approx(absf(longitudinal_vel)):
+		longitudinal_vel = 0.01
+
+	# Calculate wheel surface speed
+	var wheel_surface_speed : float = _vel * WHEEL_RADIUS
+
+	# Calculate slip (wheel speed - vehicle speed)
+	var slip : float = wheel_surface_speed - longitudinal_vel
+	#print("Slip:", slip)
+
+	# Resistance (engine brake + rolling resistance)
+	#var engine_brake : float = (1.0 - throttle) * ENGINE_BRAKE_COEFF
+	#var rolling_resistance : float = _vel * ROLLING_RESIST_COEFF
+	#var air_drag : float = drag_coeff * longitudinal_vel * absf(longitudinal_vel)
+	#var engine_friction : float = .01 * (_rpm / MAX_RPM) * _rpm
+	#var total_resistance : float = engine_brake + rolling_resistance + air_drag #+ engine_friction
+
+	
+	var wish_wheel_torque : float = wheel_torque #- total_resistance# * delta
+
+	#debug.total_decel = total_resistance# * delta
+
+	#print("Torque: " , wheel_torque , " | Resist: " , total_resistance , " | Total: ", wish_wheel_torque)
+
+	# Moment of inertia for a solid cylinder
+	var _inertia : float = WHEEL_MASS * (WHEEL_RADIUS * WHEEL_RADIUS) * 8
+
+	# Apply angular acceleration
+	var angular_accel : float = wish_wheel_torque / (_inertia)# + total_resistance)
+	_vel += angular_accel * delta
+
+	# Convert back to engine RPM
+	_rpm = _vel * gear_factor * 60.0 / TAU 
+
+	debug.torque = wish_wheel_torque
+	if wish_wheel_torque < 0.0: # if torque isn't negative for angualar_accel calulations, rpm will never go down
+		wish_wheel_torque = 0.0
+
+	# Clamp RPM to realistic bounds at the END
+	_rpm = clampf(_rpm, IDLE_RPM, MAX_RPM)
+	
+	var target_vel : float = _vel# * TAU / 60.0  # TAU = 2*PI
+	for w in wheels:
+		w.set_param_x(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_MOTOR_TARGET_VELOCITY, target_vel * gear_sign)
+		w.set_param_x(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_MOTOR_MAX_TORQUE, wish_wheel_torque)
