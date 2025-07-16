@@ -83,7 +83,9 @@ var _vel : float = 0.0 # working var for wheel angular velocity, based off throt
 enum INPUT_SCHEMES {KBM, GAMEPAD}
 static var INPUT_SCHEME := INPUT_SCHEMES.KBM
 
-
+func _ready() -> void:
+	_change_gear(cur_gear)
+	
 func _physics_process(delta: float) -> void:
 	
 	_gather_input(delta)
@@ -102,34 +104,10 @@ func _physics_process(delta: float) -> void:
 		w.set_param_y(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_LIMIT_LOWER, base_steer_angle * turn_factor)
 		w.set_param_y(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_LIMIT_UPPER, base_steer_angle * turn_factor)
 
-	var drag_torque := _rpm * .005#motor_drag
-	torque_output = _get_torque_at_rpm(_rpm) * throttle
-	## Adjust torque based on throttle input, clutch input, and motor drag
-	torque_output -= drag_torque #* (1.0 + (clutch_amount * (1.0 - throttle_amount)))
-	
-	## Prevent motor from outputting torque below idle or far beyond redline
-	var new_rpm := _rpm
-	new_rpm += (60.0 / TAU) * delta * torque_output / .5 #moter_inertia
-	is_redline = false
-	if new_rpm > MAX_RPM * 1.1 or new_rpm <= IDLE_RPM:
-		torque_output = 0.0
-		if new_rpm > MAX_RPM * 1.1:
-			is_redline = true
-	
-	_rpm += (60.0 / TAU) * delta * (torque_output - drag_torque) / .5 #motor_inertia
-	
-	## Disengage clutch when near idle
-	# if motor_rpm < idle_rpm + 100:
-	# 	need_clutch = true
-	# elif new_rpm > maxf(clutch_out_rpm, idle_rpm):
-	# 	need_clutch = false
-	
-	_rpm = maxf(_rpm, IDLE_RPM)
+	_simple_accel(delta)
+	#dashoe(delta)
+	#grrrr(delta)
 
-	var target_vel := _rpm * TAU / 60.0 
-	for w in wheels:
-		w.set_param_x(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_MOTOR_TARGET_VELOCITY, target_vel * gear_sign)
-		w.set_param_x(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_MOTOR_MAX_TORQUE, torque_output * GEAR_RATIOS[cur_gear] * DIFF_RATIO)
 
 func _get_torque_at_rpm(cur_rpm : float)->float:
 	var rpm_factor : float = clampf((cur_rpm - IDLE_RPM) / MAX_RPM, 0.0, 1.0)
@@ -240,10 +218,10 @@ func _simple_accel(delta: float)->void:
 	
 	# these allow for more realistic deceleration
 	var rolling_resist : float = rolling_resist_coeff * _vel 
-	var air_drag : float = drag_coeff * _vel * _vel
+	#var air_drag : float = drag_coeff * _vel * _vel
 	var engine_brake: float  = (1.0 - throttle) * engine_brake_coeff
 
-	var total_decel : float = rolling_resist + air_drag + engine_brake
+	var total_decel : float = rolling_resist+ engine_brake# + air_drag 
 	debug.total_decel = total_decel # update value in debug ui
 
 	_vel -= total_decel * delta	
@@ -259,11 +237,12 @@ func _simple_accel(delta: float)->void:
 			target_vel = 0.0
 			target_torque = brake_torque
 
+	debug.torque = target_torque
 	for w in wheels:
 		if throttle > 0.0:
 			# apply forces as normal
 			w.set_param_x(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_MOTOR_MAX_TORQUE, target_torque)
-			w.set_param_x(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_MOTOR_TARGET_VELOCITY, deg_to_rad(target_vel))
+			w.set_param_x(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_MOTOR_TARGET_VELOCITY, target_vel)
 		else:
 			# no throttle, so let wheels carry momentum and roll freely
 			w.set_param_x(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_MOTOR_TARGET_VELOCITY, 0.0)
@@ -277,7 +256,7 @@ func _simple_accel(delta: float)->void:
 				w.set_param_x(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_MOTOR_MAX_TORQUE, foward_roll_torque + brake_torque) # rolling fowards
 
 func grrrr(delta: float)->void:
-	var gear_factor : float = GEAR_RATIOS[cur_gear] * DIFF_RATIO
+	var gear_factor : float = GEAR_RATIOS[cur_gear] #* DIFF_RATIO
 
 	# Get engine torque at current RPM
 	var cur_torque: float = _get_torque_at_rpm(_rpm)
@@ -311,31 +290,71 @@ func grrrr(delta: float)->void:
 	#var engine_friction : float = .01 * (_rpm / MAX_RPM) * _rpm
 	#var total_resistance : float = engine_brake + rolling_resistance + air_drag #+ engine_friction
 
-	
-	var wish_wheel_torque : float = wheel_torque #- total_resistance# * delta
+	var drag_torque : float = _rpm * .007
+	var wish_wheel_torque : float = wheel_torque - drag_torque #- total_resistance# * delta
 
 	#debug.total_decel = total_resistance# * delta
 
 	#print("Torque: " , wheel_torque , " | Resist: " , total_resistance , " | Total: ", wish_wheel_torque)
 
 	# Moment of inertia for a solid cylinder
-	var _inertia : float = WHEEL_MASS * (WHEEL_RADIUS * WHEEL_RADIUS) * 8
+	var _inertia : float = WHEEL_MASS * (WHEEL_RADIUS * WHEEL_RADIUS) * 8 +.5
+
+	var new_rpm := _rpm
+	new_rpm += (60.0 / TAU) * delta * wish_wheel_torque/ _inertia #moter_inertia
+	is_redline = false
+	if new_rpm > MAX_RPM * 1.1 or new_rpm <= IDLE_RPM:
+		wish_wheel_torque = 0.0
+		if new_rpm > MAX_RPM * 1.1:
+			is_redline = true
 
 	# Apply angular acceleration
 	var angular_accel : float = wish_wheel_torque / (_inertia)# + total_resistance)
-	_vel += angular_accel * delta
+	_vel += delta * (wish_wheel_torque - drag_torque) / _inertia#angular_accel * delta
 
 	# Convert back to engine RPM
 	_rpm = _vel * gear_factor * 60.0 / TAU 
 
 	debug.torque = wish_wheel_torque
+	
+	var target_torque : float = wish_wheel_torque
 	if wish_wheel_torque < 0.0: # if torque isn't negative for angualar_accel calulations, rpm will never go down
-		wish_wheel_torque = 0.0
-
+		target_torque = foward_roll_torque
 	# Clamp RPM to realistic bounds at the END
-	_rpm = clampf(_rpm, IDLE_RPM, MAX_RPM)
+	#_rpm = clampf(_rpm, IDLE_RPM, MAX_RPM)
+	_rpm = maxf(_rpm, IDLE_RPM)
 	
 	var target_vel : float = _vel# * TAU / 60.0  # TAU = 2*PI
 	for w in wheels:
 		w.set_param_x(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_MOTOR_TARGET_VELOCITY, target_vel * gear_sign)
-		w.set_param_x(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_MOTOR_MAX_TORQUE, wish_wheel_torque)
+		w.set_param_x(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_MOTOR_MAX_TORQUE, target_torque)
+
+func dashoe(delta: float)->void:
+	var drag_torque := _rpm * .005#motor_drag
+	torque_output = _get_torque_at_rpm(_rpm) * throttle
+	## Adjust torque based on throttle input, clutch input, and motor drag
+	torque_output -= drag_torque #* (1.0 + (clutch_amount * (1.0 - throttle_amount)))
+	
+	## Prevent motor from outputting torque below idle or far beyond redline
+	var new_rpm := _rpm
+	new_rpm += (60.0 / TAU) * delta * torque_output / .5 #moter_inertia
+	is_redline = false
+	if new_rpm > MAX_RPM * 1.1 or new_rpm <= IDLE_RPM:
+		torque_output = 0.0
+		if new_rpm > MAX_RPM * 1.1:
+			is_redline = true
+	
+	_rpm += (60.0 / TAU) * delta * (torque_output - drag_torque) / .5 #motor_inertia
+	
+	## Disengage clutch when near idle
+	# if motor_rpm < idle_rpm + 100:
+	# 	need_clutch = true
+	# elif new_rpm > maxf(clutch_out_rpm, idle_rpm):
+	# 	need_clutch = false
+	
+	_rpm = maxf(_rpm, IDLE_RPM)
+
+	var target_vel := _rpm * TAU / 60.0 
+	for w in wheels:
+		w.set_param_x(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_MOTOR_TARGET_VELOCITY, target_vel * gear_sign)
+		w.set_param_x(JoltGeneric6DOFJoint3D.PARAM_ANGULAR_MOTOR_MAX_TORQUE, torque_output * GEAR_RATIOS[cur_gear] * DIFF_RATIO)
