@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3 uid="uid://cgb6gqjj7k200"]
+[gd_scene load_steps=22 format=3 uid="uid://cgb6gqjj7k200"]
 
 [ext_resource type="Script" uid="uid://c1l10syewe5ww" path="res://rover/rock_crawler.gd" id="1_gyth0"]
 [ext_resource type="PackedScene" uid="uid://1j3lg7r60apb" path="res://rover/Car6.glb" id="1_x4twm"]
@@ -10,16 +10,20 @@
 [ext_resource type="Script" uid="uid://75xc5j2oh85r" path="res://rover/debug_ui.gd" id="7_cttij"]
 
 [sub_resource type="Curve" id="Curve_cttij"]
-_data = [Vector2(0, 0.151856), 0.0, -0.191929, 0, 0, Vector2(0.231429, 0.371204), 1.49798, 1.49798, 0, 0, Vector2(0.465714, 0.978065), 0.0, 0.0, 0, 0, Vector2(0.683432, 0.695193), -0.942298, -0.942298, 0, 0, Vector2(0.905714, 0.327334), -1.52325, 0.0, 0, 0]
+_data = [Vector2(0, 0.151856), 0.0, -0.191929, 0, 0, Vector2(0.231429, 0.371204), 1.49798, 1.49798, 0, 0, Vector2(0.473373, 1), 0.0, 0.0, 0, 0, Vector2(0.647929, 0.504689), -1.91332, -1.91332, 0, 0, Vector2(0.931953, 0.123681), -1.52325, 0.0, 0, 0]
 point_count = 5
 
 [sub_resource type="Curve" id="Curve_io7wc"]
 _data = [Vector2(0, 0), 0.0, 0.346457, 0, 0, Vector2(0.717143, 0.473566), 1.2523, 1.2523, 0, 0, Vector2(1, 1), 0.965681, 0.0, 0, 0]
 point_count = 3
 
-[sub_resource type="Curve" id="Curve_kyh8j"]
-_data = [Vector2(0.00591716, 0.53517), 0.0, 1.50768, 0, 0, Vector2(0.769231, 1), 0.0, 0.0, 0, 0, Vector2(0.769241, 1), 0.0, 0.0, 0, 0, Vector2(0.769251, 1), 0.0, 0.0, 0, 0, Vector2(0.997041, 0.748535), -2.04273, 0.0, 0, 0]
-point_count = 5
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_io7wc"]
+rough = true
+bounce = 0.23
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_kyh8j"]
+friction = 0.5
+bounce = 0.23
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_yol4y"]
 size = Vector3(2.336, 1.01691, 6.16797)
@@ -59,18 +63,20 @@ wheels = [NodePath("Wheel6DOFs/FR_Wheel_Rotator/FR_DOF"), NodePath("Wheel6DOFs/F
 steer_wheels = [NodePath("Wheel6DOFs/FR_Wheel_Rotator/FR_DOF"), NodePath("Wheel6DOFs/FL_Wheel_Rotator/FL_DOF")]
 test = NodePath("wheels/FR_Wheel")
 debug = NodePath("Control")
-max_speeds = Array[float]([15.0, 15.0, 30.0])
-accelerations = Array[float]([30.0, 30.0, 20.0])
+max_speeds = Array[float]([15.0, 9.0, 30.0, 50.0])
+accelerations = Array[float]([15.0, 8.0, 8.0, 10.0])
+gear_ratios = Array[float]([2.0, 3.42, 2.1, 1.6])
 decel = 500.0
 accel_curve = SubResource("Curve_cttij")
 brake_curve = SubResource("Curve_io7wc")
+max_drive_torques = Array[float]([2000.0, 2000.0, 200.0, 100.0])
 max_brake_torque = 100.0
+rolling_resist_coeff = 0.005
 engine_brake_coeff = 2.0
-TORQUE_CURVE = SubResource("Curve_kyh8j")
-MAX_RPM = 7000.0
-MAX_TORQUE = 200.0
 MAX_STEER_ANGLE = 30.0
 do_wheel_straighten = true
+grip_tire_mat = SubResource("PhysicsMaterial_io7wc")
+slip_tire_mat = SubResource("PhysicsMaterial_kyh8j")
 
 [node name="Car62" parent="." instance=ExtResource("1_x4twm")]
 
@@ -97,6 +103,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.18, 0.0333338, 1.96954)
 collision_layer = 4
 mass = 12.0
 continuous_cd = true
+contact_monitor = true
+max_contacts_reported = 4
 
 [node name="Car_wheel" parent="wheels/FR_Wheel" instance=ExtResource("2_e6aj7")]
 
@@ -109,6 +117,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.18, 0.0333338, 1.97)
 collision_layer = 4
 mass = 12.0
 continuous_cd = true
+contact_monitor = true
+max_contacts_reported = 4
 
 [node name="Car_wheel" parent="wheels/FL_Wheel" instance=ExtResource("2_e6aj7")]
 
@@ -121,6 +131,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.18, 0.0333338, -1.78673)
 collision_layer = 4
 mass = 12.0
 continuous_cd = true
+contact_monitor = true
+max_contacts_reported = 4
 
 [node name="Car_wheel" parent="wheels/RR_Wheel" instance=ExtResource("2_e6aj7")]
 
@@ -133,6 +145,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.18, 0.0333338, -1.78627)
 collision_layer = 4
 mass = 12.0
 continuous_cd = true
+contact_monitor = true
+max_contacts_reported = 4
 
 [node name="Car_wheel" parent="wheels/RL_Wheel" instance=ExtResource("2_e6aj7")]
 
@@ -299,7 +313,7 @@ linear_spring_y/enabled = true
 linear_spring_y/frequency = 30.0
 linear_spring_y/damping = 0.8
 linear_spring_y/equilibrium_point = -0.3
-linear_spring_y/max_force = 1000.0
+linear_spring_y/max_force = 800.0
 angular_limit_z/enabled = false
 angular_spring_z/frequency = 4.0
 angular_spring_z/damping = 1.0
@@ -326,7 +340,7 @@ linear_spring_y/enabled = true
 linear_spring_y/frequency = 30.0
 linear_spring_y/damping = 0.8
 linear_spring_y/equilibrium_point = -0.3
-linear_spring_y/max_force = 1000.0
+linear_spring_y/max_force = 800.0
 angular_limit_z/enabled = false
 angular_spring_z/frequency = 4.0
 angular_spring_z/damping = 1.0
@@ -356,7 +370,7 @@ linear_spring_y/enabled = true
 linear_spring_y/frequency = 30.0
 linear_spring_y/damping = 0.8
 linear_spring_y/equilibrium_point = -0.3
-linear_spring_y/max_force = 1000.0
+linear_spring_y/max_force = 800.0
 angular_limit_z/enabled = false
 angular_spring_z/frequency = 4.0
 angular_spring_z/damping = 1.0
@@ -382,7 +396,7 @@ linear_spring_y/enabled = true
 linear_spring_y/frequency = 30.0
 linear_spring_y/damping = 0.8
 linear_spring_y/equilibrium_point = -0.3
-linear_spring_y/max_force = 1000.0
+linear_spring_y/max_force = 800.0
 angular_limit_z/enabled = false
 angular_spring_z/frequency = 4.0
 angular_spring_z/damping = 1.0

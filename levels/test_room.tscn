@@ -35,16 +35,16 @@ environment = SubResource("Environment_y5wqh")
 
 [node name="CSGBox3D" type="CSGBox3D" parent="."]
 use_collision = true
+collision_mask = 5
 size = Vector3(400, 0.01, 400)
 material = SubResource("StandardMaterial3D_77pwf")
 
 [node name="CSGBox3D2" type="CSGBox3D" parent="."]
 transform = Transform3D(0.98055, 0.196271, 0, -0.196271, 0.98055, 0, 0, 0, 1, -7.16343, 0.173584, 1.5)
 use_collision = true
+collision_mask = 5
 size = Vector3(7.98523, 1, 4)
 material = SubResource("StandardMaterial3D_lktwm")
 
-[node name="Body" parent="." node_paths=PackedStringArray("wheels", "steer_wheels") instance=ExtResource("3_x4mbn")]
-transform = Transform3D(0.230712, 0, -0.973022, 0, 1, 0, 0.973022, 0, 0.230712, -6.67656, 2.19512, -1.61501)
-wheels = []
-steer_wheels = []
+[node name="RockCrawler" parent="." instance=ExtResource("3_x4mbn")]
+transform = Transform3D(0.237788, 0, -0.971317, 0, 1, 0, 0.971317, 0, 0.237788, -7.12311, 2.05349, -1.41511)
